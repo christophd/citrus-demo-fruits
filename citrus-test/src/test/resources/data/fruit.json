@@ -1,0 +1,10 @@
+{
+  "name": "Coconut",
+  "description": "citrus:randomString(10)",
+  "category": {
+    "id": 2,
+    "name": "tropical"
+  },
+  "status": "PENDING",
+  "tags": ["sweet", "cocktail"]
+}

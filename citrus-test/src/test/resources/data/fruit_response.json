@@ -1,0 +1,12 @@
+{
+  "id": ${id},
+  "name": "Pineapple",
+  "description": "@ignore@",
+  "category":{
+    "id": 2,
+    "name": "tropical"
+  },
+  "status": "PENDING",
+  "price": 1.99,
+  "tags": ["cocktail"]
+}
