@@ -24,6 +24,7 @@ import com.consol.citrus.http.client.HttpClient;
 import com.consol.citrus.http.server.HttpServer;
 import com.consol.citrus.junit.JUnit4CitrusSupport;
 import org.citrusframework.demo.behavior.AddFruitBehavior;
+import org.citrusframework.demo.config.EndpointConfig;
 import org.citrusframework.demo.fruits.model.Category;
 import org.citrusframework.demo.fruits.model.Fruit;
 import org.junit.Test;

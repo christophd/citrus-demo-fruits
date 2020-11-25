@@ -66,6 +66,11 @@
     </dependency>
     <dependency>
       <groupId>com.consol.citrus</groupId>
+      <artifactId>citrus-selenium</artifactId>
+      <version>${citrus.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.consol.citrus</groupId>
       <artifactId>citrus-junit</artifactId>
       <version>${citrus.version}</version>
     </dependency>

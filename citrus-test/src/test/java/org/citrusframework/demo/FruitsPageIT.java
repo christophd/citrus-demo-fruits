@@ -22,25 +22,25 @@ import javax.sql.DataSource;
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.http.client.HttpClient;
 import com.consol.citrus.junit.JUnit4CitrusSupport;
-import com.consol.citrus.message.builder.ObjectMappingPayloadBuilder;
+import com.consol.citrus.selenium.endpoint.SeleniumBrowser;
 import org.citrusframework.demo.config.EndpointConfig;
 import org.citrusframework.demo.fruits.model.Category;
 import org.citrusframework.demo.fruits.model.Fruit;
+import org.citrusframework.demo.page.FruitsPage;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 
-import static com.consol.citrus.actions.ExecuteSQLQueryAction.Builder.query;
-import static com.consol.citrus.http.actions.HttpActionBuilder.http;
-import static com.consol.citrus.validation.json.JsonPathVariableExtractor.Builder.jsonPathExtractor;
+import static com.consol.citrus.selenium.actions.SeleniumActionBuilder.selenium;
 
 /**
  * @author Christoph Deppisch
  */
 @ContextConfiguration(classes = EndpointConfig.class)
-public class PersistFruitsIT extends JUnit4CitrusSupport {
+public class FruitsPageIT extends JUnit4CitrusSupport {
+
+    @Autowired
+    private SeleniumBrowser browser;
 
     @Autowired
     private HttpClient fruitStoreClient;
@@ -50,24 +50,29 @@ public class PersistFruitsIT extends JUnit4CitrusSupport {
 
     @Test
     @CitrusTest
-    public void shouldPersistFruits() {
-        Fruit fruit = TestHelper.createFruit("Nectarine",
-                new Category( "pomme"), Fruit.Status.PENDING, "summer");
+    public void shouldGetFruitsWithModel() {
+        Fruit fruit = TestHelper.createFruit("Grapefruit",
+                new Category(2L, "tropical"), Fruit.Status.PENDING, "juicy,healthy");
+        fruit.setDescription("Not everybody likes it");
+        FruitsPage page = new FruitsPage(fruit);
 
-        when(http().client(fruitStoreClient)
-                .send()
-                .post("/fruits")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .payload(new ObjectMappingPayloadBuilder(fruit)));
+        given(selenium()
+                .browser(browser)
+                .start());
 
-        then(http().client(fruitStoreClient)
-                .receive()
-                .response(HttpStatus.CREATED)
-                .process(jsonPathExtractor()
-                        .expression("$.id", "id")));
+        given(selenium()
+                .navigate(fruitStoreClient.getEndpointConfiguration().getRequestUrl()));
 
-        then(query(fruitsDataSource)
-            .statement("SELECT id, name FROM fruit WHERE id=${id}")
-            .validate("name", fruit.getName()));
+        given(selenium()
+                .page(page)
+                .validate());
+
+        when(selenium()
+                .page(page)
+                .execute("addFruit"));
+
+        given(selenium()
+                .page(page)
+                .validate());
     }
 }

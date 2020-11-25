@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.citrusframework.demo;
+package org.citrusframework.demo.config;
 
 import com.consol.citrus.container.BeforeTest;
 import com.consol.citrus.container.SequenceBeforeTest;
@@ -33,10 +33,12 @@ import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.Import;
 
 import static com.consol.citrus.actions.PurgeEndpointAction.Builder.purgeEndpoints;
 
 @Configuration
+@Import(SeleniumConfig.class)
 public class EndpointConfig {
 
     private static final int FRUIT_STORE_SERVICE_PORT = 8080;

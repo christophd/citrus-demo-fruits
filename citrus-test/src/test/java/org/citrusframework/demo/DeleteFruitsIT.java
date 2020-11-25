@@ -25,6 +25,7 @@ import com.consol.citrus.junit.JUnit4CitrusSupport;
 import com.consol.citrus.kafka.endpoint.KafkaEndpoint;
 import com.consol.citrus.kafka.message.KafkaMessageHeaders;
 import org.citrusframework.demo.behavior.AddFruitBehavior;
+import org.citrusframework.demo.config.EndpointConfig;
 import org.citrusframework.demo.fruits.model.Category;
 import org.citrusframework.demo.fruits.model.Fruit;
 import org.junit.Test;

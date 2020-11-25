@@ -23,6 +23,7 @@ import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.http.client.HttpClient;
 import com.consol.citrus.junit.JUnit4CitrusSupport;
 import com.consol.citrus.message.builder.ObjectMappingPayloadBuilder;
+import org.citrusframework.demo.config.EndpointConfig;
 import org.citrusframework.demo.fruits.model.Category;
 import org.citrusframework.demo.fruits.model.Fruit;
 import org.junit.Test;
