@@ -58,13 +58,8 @@ public class FruitResource {
 
     @POST
     @Operation(operationId = "addFruit")
-    @Consumes(MediaType.APPLICATION_JSON)
+    @Consumes({MediaType.APPLICATION_JSON})
     public Response add(Fruit fruit) {
-        if (fruit.getId() != null &&
-                store.findAll().stream().anyMatch(f -> f.getId().equals(fruit.getId()))) {
-            throw new IllegalArgumentException(String.format("Fruit with id '%s' already exists", fruit.getId()));
-        }
-
         store.add(fruit);
         fruitEvents.onAdded(fruit.getId().toString());
         return Response.status(Response.Status.CREATED)

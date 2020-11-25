@@ -20,6 +20,7 @@ package org.citrusframework.demo.fruits.model;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.SequenceGenerator;
 
@@ -27,8 +28,12 @@ import javax.persistence.SequenceGenerator;
  * @author Christoph Deppisch
  */
 @Entity
-@NamedQuery(name = "Categories.findByName",
-        query = "SELECT c FROM Category c WHERE c.name = :name")
+@NamedQueries({
+        @NamedQuery(name = "Categories.findByName",
+                query = "SELECT c FROM Category c WHERE c.name = :name"),
+        @NamedQuery(name = "Categories.findAll",
+                query = "SELECT c FROM Category c ORDER BY c.id")
+})
 public class Category {
 
     public Long id;

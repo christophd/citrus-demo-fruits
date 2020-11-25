@@ -79,6 +79,11 @@ public class FruitStore {
 
     @Transactional
     public void add(Fruit fruit) {
+        if (fruit.getId() != null &&
+                findAll().stream().anyMatch(f -> f.getId().equals(fruit.getId()))) {
+            throw new IllegalArgumentException(String.format("Fruit with id '%s' already exists", fruit.getId()));
+        }
+
         try {
             Category category = em.createNamedQuery("Categories.findByName", Category.class)
                             .setParameter("name", fruit.getCategory().getName())
@@ -103,5 +108,9 @@ public class FruitStore {
     @Transactional
     public void remove(Long id) {
         em.remove(findById(id));
+    }
+
+    public List<Category> getCategories() {
+        return em.createNamedQuery("Categories.findAll", Category.class).getResultList();
     }
 }
