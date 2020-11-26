@@ -21,6 +21,7 @@ import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.http.client.HttpClient;
 import com.consol.citrus.junit.JUnit4CitrusSupport;
 import com.consol.citrus.message.builder.ObjectMappingPayloadBuilder;
+import org.citrusframework.demo.behavior.AddFruitBehavior;
 import org.citrusframework.demo.config.EndpointConfig;
 import org.citrusframework.demo.fruits.model.Category;
 import org.citrusframework.demo.fruits.model.Fruit;
@@ -94,5 +95,14 @@ public class AddFruitsIT extends JUnit4CitrusSupport {
         then(http().client(fruitStoreClient)
                 .receive()
                 .response(HttpStatus.CREATED));
+    }
+
+    @Test
+    @CitrusTest
+    public void shouldAddFruitsFromBehavior() {
+        Fruit fruit = TestHelper.createFruit("Raspberry",
+                new Category("berry"), Fruit.Status.PENDING, "smoothie");
+
+        given(applyBehavior(new AddFruitBehavior(fruit, fruitStoreClient)));
     }
 }
