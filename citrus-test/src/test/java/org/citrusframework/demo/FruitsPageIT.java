@@ -17,8 +17,6 @@
 
 package org.citrusframework.demo;
 
-import javax.sql.DataSource;
-
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.http.client.HttpClient;
 import com.consol.citrus.junit.JUnit4CitrusSupport;
@@ -44,9 +42,6 @@ public class FruitsPageIT extends JUnit4CitrusSupport {
 
     @Autowired
     private HttpClient fruitStoreClient;
-
-    @Autowired
-    private DataSource fruitsDataSource;
 
     @Test
     @CitrusTest

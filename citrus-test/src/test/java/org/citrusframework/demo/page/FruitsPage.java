@@ -63,7 +63,7 @@ public class FruitsPage implements WebPage, PageValidator<FruitsPage> {
     }
 
     /**
-     * Add fruit via HTML form submit on the page.
+     * Adds fruit via HTML form submit on the page.
      */
     public void addFruit() {
         name.sendKeys(fruit.getName());

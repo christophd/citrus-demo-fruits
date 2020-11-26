@@ -18,14 +18,18 @@
 package org.citrusframework.demo;
 
 import java.math.BigDecimal;
+import java.util.Map;
 
 import com.consol.citrus.annotations.CitrusTest;
+import com.consol.citrus.context.TestContext;
 import com.consol.citrus.http.client.HttpClient;
 import com.consol.citrus.junit.JUnit4CitrusSupport;
 import com.consol.citrus.message.builder.ObjectMappingPayloadBuilder;
+import com.consol.citrus.validation.json.JsonMappingValidationCallback;
 import org.citrusframework.demo.config.EndpointConfig;
 import org.citrusframework.demo.fruits.model.Category;
 import org.citrusframework.demo.fruits.model.Fruit;
+import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -35,6 +39,7 @@ import org.springframework.test.context.ContextConfiguration;
 
 import static com.consol.citrus.actions.CreateVariablesAction.Builder.createVariable;
 import static com.consol.citrus.http.actions.HttpActionBuilder.http;
+import static com.consol.citrus.validation.json.JsonPathMessageValidationContext.Builder.jsonPath;
 
 /**
  * @author Christoph Deppisch
@@ -107,5 +112,49 @@ public class GetFruitsIT extends JUnit4CitrusSupport {
                 .receive()
                 .response(HttpStatus.OK)
                 .payload(new ObjectMappingPayloadBuilder(fruit)));
+    }
+
+    @Test
+    @CitrusTest
+    public void shouldGetFruitsWithJsonPath() {
+        variable("id", "1001");
+
+        when(http().client(fruitStoreClient)
+                .send()
+                .get("/fruits/${id}")
+                .contentType(MediaType.APPLICATION_JSON_VALUE));
+
+        then(http().client(fruitStoreClient)
+                .receive()
+                .response(HttpStatus.OK)
+                .validate(jsonPath()
+                        .expression("$.id", "${id}")
+                        .expression("$.name", "Pineapple")
+                        .expression("$.category.name", "tropical")
+                        .expression("$.status", Fruit.Status.PENDING)
+                        .expression("$.tags.size()", 1L)
+                        .expression("$.price", BigDecimal.valueOf(1.99D))));
+    }
+
+    @Test
+    @CitrusTest
+    public void shouldGetFruitsWithValidator() {
+        variable("id", "1001");
+
+        when(http().client(fruitStoreClient)
+                .send()
+                .get("/fruits/${id}")
+                .contentType(MediaType.APPLICATION_JSON_VALUE));
+
+        then(http().client(fruitStoreClient)
+                .receive()
+                .response(HttpStatus.OK)
+                .validationCallback(new JsonMappingValidationCallback<Fruit>(Fruit.class) {
+                    @Override
+                    public void validate(Fruit fruit, Map<String, Object> headers, TestContext context) {
+                        Assert.assertEquals("Pineapple", fruit.getName());
+                        Assert.assertEquals("tropical", fruit.getCategory().getName());
+                    }
+                }));
     }
 }
