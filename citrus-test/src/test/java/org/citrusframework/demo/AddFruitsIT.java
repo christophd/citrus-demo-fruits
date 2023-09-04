@@ -17,16 +17,19 @@
 
 package org.citrusframework.demo;
 
+import org.citrusframework.GherkinTestActionRunner;
+import org.citrusframework.annotations.CitrusResource;
 import org.citrusframework.annotations.CitrusTest;
-import org.citrusframework.http.client.HttpClient;
-import org.citrusframework.junit.spring.JUnit4CitrusSpringSupport;
-import org.citrusframework.message.builder.ObjectMappingPayloadBuilder;
+import org.citrusframework.config.CitrusSpringConfig;
 import org.citrusframework.demo.behavior.AddFruitBehavior;
 import org.citrusframework.demo.config.EndpointConfig;
 import org.citrusframework.demo.fruits.model.Category;
 import org.citrusframework.demo.fruits.model.Fruit;
 import org.citrusframework.demo.fruits.model.Nutrition;
-import org.junit.Test;
+import org.citrusframework.http.client.HttpClient;
+import org.citrusframework.junit.jupiter.spring.CitrusSpringSupport;
+import org.citrusframework.message.builder.ObjectMappingPayloadBuilder;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
@@ -34,20 +37,22 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 
 import static org.citrusframework.http.actions.HttpActionBuilder.http;
+import static org.citrusframework.actions.ApplyTestBehaviorAction.Builder.apply;
 
 /**
  * @author Christoph Deppisch
  */
-@ContextConfiguration(classes = EndpointConfig.class)
-public class AddFruitsIT extends JUnit4CitrusSpringSupport {
+@CitrusSpringSupport
+@ContextConfiguration(classes = { CitrusSpringConfig.class, EndpointConfig.class })
+public class AddFruitsIT {
 
     @Autowired
     private HttpClient fruitStoreClient;
 
     @Test
     @CitrusTest
-    public void shouldAddFruits() {
-        when(http().client(fruitStoreClient)
+    public void shouldAddFruits(@CitrusResource GherkinTestActionRunner $) {
+        $.when(http().client(fruitStoreClient)
                 .send()
                 .post("/api/fruits")
                 .message()
@@ -67,50 +72,50 @@ public class AddFruitsIT extends JUnit4CitrusSpringSupport {
                     "\"tags\": [\"sweet\"]" +
                 "}"));
 
-        then(http().client(fruitStoreClient)
+        $.then(http().client(fruitStoreClient)
                 .receive()
                 .response(HttpStatus.CREATED));
     }
 
     @Test
     @CitrusTest
-    public void shouldAddFruitsFromResource() {
-        when(http().client(fruitStoreClient)
+    public void shouldAddFruitsFromResource(@CitrusResource GherkinTestActionRunner $) {
+        $.when(http().client(fruitStoreClient)
                 .send()
                 .post("/api/fruits")
                 .message()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(new ClassPathResource("data/fruit.json")));
 
-        then(http().client(fruitStoreClient)
+        $.then(http().client(fruitStoreClient)
                 .receive()
                 .response(HttpStatus.CREATED));
     }
 
     @Test
     @CitrusTest
-    public void shouldAddFruitsFromModel() {
+    public void shouldAddFruitsFromModel(@CitrusResource GherkinTestActionRunner $) {
         Fruit fruit = TestHelper.createFruit("Blueberry",
                 new Category("berry"), new Nutrition(34, 8), Fruit.Status.PENDING, "smoothie");
 
-        when(http().client(fruitStoreClient)
+        $.when(http().client(fruitStoreClient)
                 .send()
                 .post("/api/fruits")
                 .message()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(new ObjectMappingPayloadBuilder(fruit)));
 
-        then(http().client(fruitStoreClient)
+        $.then(http().client(fruitStoreClient)
                 .receive()
                 .response(HttpStatus.CREATED));
     }
 
     @Test
     @CitrusTest
-    public void shouldAddFruitsFromBehavior() {
+    public void shouldAddFruitsFromBehavior(@CitrusResource GherkinTestActionRunner $) {
         Fruit fruit = TestHelper.createFruit("Raspberry",
                 new Category("berry"), new Nutrition(42, 9), Fruit.Status.PENDING, "smoothie");
 
-        given(applyBehavior(new AddFruitBehavior(fruit, fruitStoreClient)));
+        $.given(apply().behavior(new AddFruitBehavior(fruit, fruitStoreClient)));
     }
 }

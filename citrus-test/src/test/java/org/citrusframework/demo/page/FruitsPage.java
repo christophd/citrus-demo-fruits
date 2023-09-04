@@ -18,11 +18,11 @@
 package org.citrusframework.demo.page;
 
 import org.citrusframework.context.TestContext;
+import org.citrusframework.demo.fruits.model.Fruit;
 import org.citrusframework.selenium.endpoint.SeleniumBrowser;
 import org.citrusframework.selenium.model.PageValidator;
 import org.citrusframework.selenium.model.WebPage;
-import org.citrusframework.demo.fruits.model.Fruit;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
@@ -96,7 +96,7 @@ public class FruitsPage implements WebPage, PageValidator<FruitsPage> {
 
     @Override
     public void validate(FruitsPage webPage, SeleniumBrowser browser, TestContext context) {
-        Assert.assertEquals("Fruit Store Demo", heading.getText());
-        Assert.assertTrue(saveButton.isEnabled());
+        Assertions.assertEquals("Fruit Store Demo", heading.getText());
+        Assertions.assertTrue(saveButton.isEnabled());
     }
 }

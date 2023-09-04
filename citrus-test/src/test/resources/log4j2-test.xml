@@ -48,6 +48,10 @@
       <AppenderRef ref="STDOUT"/>
     </Logger>
 
+    <Logger name="com.gargoylesoftware.htmlunit" additivity="false" level="ERROR">
+      <AppenderRef ref="STDOUT"/>
+    </Logger>
+
     <Logger name="org.apache" additivity="false" level="WARN">
       <AppenderRef ref="STDOUT"/>
     </Logger>

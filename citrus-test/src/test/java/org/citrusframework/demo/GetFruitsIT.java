@@ -20,18 +20,21 @@ package org.citrusframework.demo;
 import java.math.BigDecimal;
 import java.util.Map;
 
+import org.citrusframework.GherkinTestActionRunner;
+import org.citrusframework.annotations.CitrusResource;
 import org.citrusframework.annotations.CitrusTest;
+import org.citrusframework.config.CitrusSpringConfig;
 import org.citrusframework.context.TestContext;
-import org.citrusframework.http.client.HttpClient;
-import org.citrusframework.junit.spring.JUnit4CitrusSpringSupport;
-import org.citrusframework.message.builder.ObjectMappingPayloadBuilder;
-import org.citrusframework.validation.json.JsonMappingValidationProcessor;
 import org.citrusframework.demo.config.EndpointConfig;
 import org.citrusframework.demo.fruits.model.Category;
 import org.citrusframework.demo.fruits.model.Fruit;
 import org.citrusframework.demo.fruits.model.Nutrition;
-import org.junit.Assert;
-import org.junit.Test;
+import org.citrusframework.http.client.HttpClient;
+import org.citrusframework.junit.jupiter.spring.CitrusSpringSupport;
+import org.citrusframework.message.builder.ObjectMappingPayloadBuilder;
+import org.citrusframework.validation.json.JsonMappingValidationProcessor;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
@@ -45,24 +48,25 @@ import static org.citrusframework.validation.json.JsonPathMessageValidationConte
 /**
  * @author Christoph Deppisch
  */
-@ContextConfiguration(classes = EndpointConfig.class)
-public class GetFruitsIT extends JUnit4CitrusSpringSupport {
+@CitrusSpringSupport
+@ContextConfiguration(classes = { CitrusSpringConfig.class, EndpointConfig.class })
+public class GetFruitsIT {
 
     @Autowired
     private HttpClient fruitStoreClient;
 
     @Test
     @CitrusTest
-    public void shouldGetFruits() {
-        given(createVariable("id", "1001"));
+    public void shouldGetFruits(@CitrusResource GherkinTestActionRunner $) {
+        $.given(createVariable("id", "1001"));
 
-        when(http().client(fruitStoreClient)
+        $.when(http().client(fruitStoreClient)
                 .send()
                 .get("/api/fruits/${id}")
                 .message()
                 .contentType(MediaType.APPLICATION_JSON_VALUE));
 
-        then(http().client(fruitStoreClient)
+        $.then(http().client(fruitStoreClient)
                 .receive()
                 .response(HttpStatus.OK)
                 .message()
@@ -87,16 +91,16 @@ public class GetFruitsIT extends JUnit4CitrusSpringSupport {
 
     @Test
     @CitrusTest
-    public void shouldGetFruitsResource() {
-        given(createVariable("id", "1001"));
+    public void shouldGetFruitsResource(@CitrusResource GherkinTestActionRunner $) {
+        $.given(createVariable("id", "1001"));
 
-        when(http().client(fruitStoreClient)
+        $.when(http().client(fruitStoreClient)
                 .send()
                 .get("/api/fruits/${id}")
                 .message()
                 .contentType(MediaType.APPLICATION_JSON_VALUE));
 
-        then(http().client(fruitStoreClient)
+        $.then(http().client(fruitStoreClient)
                 .receive()
                 .response(HttpStatus.OK)
                 .message()
@@ -105,7 +109,7 @@ public class GetFruitsIT extends JUnit4CitrusSpringSupport {
 
     @Test
     @CitrusTest
-    public void shouldGetFruitsWithModel() {
+    public void shouldGetFruitsWithModel(@CitrusResource GherkinTestActionRunner $) {
         Fruit fruit = TestHelper.createFruit("Pineapple",
                 new Category(2L, "tropical"), new Nutrition(2L, 97, 14), Fruit.Status.PENDING, "cocktail");
 
@@ -113,13 +117,13 @@ public class GetFruitsIT extends JUnit4CitrusSpringSupport {
         fruit.setDescription("@ignore@");
         fruit.setPrice(BigDecimal.valueOf(1.99D));
 
-        when(http().client(fruitStoreClient)
+        $.when(http().client(fruitStoreClient)
                 .send()
                 .get("/api/fruits/" + fruit.getId())
                 .message()
                 .contentType(MediaType.APPLICATION_JSON_VALUE));
 
-        then(http().client(fruitStoreClient)
+        $.then(http().client(fruitStoreClient)
                 .receive()
                 .response(HttpStatus.OK)
                 .message()
@@ -128,16 +132,16 @@ public class GetFruitsIT extends JUnit4CitrusSpringSupport {
 
     @Test
     @CitrusTest
-    public void shouldGetFruitsWithJsonPath() {
-        variable("id", "1001");
+    public void shouldGetFruitsWithJsonPath(@CitrusResource GherkinTestActionRunner $) {
+        $.given(createVariable("id", "1001"));
 
-        when(http().client(fruitStoreClient)
+        $.when(http().client(fruitStoreClient)
                 .send()
                 .get("/api/fruits/${id}")
                 .message()
                 .contentType(MediaType.APPLICATION_JSON_VALUE));
 
-        then(http().client(fruitStoreClient)
+        $.then(http().client(fruitStoreClient)
                 .receive()
                 .response(HttpStatus.OK)
                 .validate(jsonPath()
@@ -151,23 +155,23 @@ public class GetFruitsIT extends JUnit4CitrusSpringSupport {
 
     @Test
     @CitrusTest
-    public void shouldGetFruitsWithValidator() {
-        variable("id", "1001");
+    public void shouldGetFruitsWithValidator(@CitrusResource GherkinTestActionRunner $) {
+        $.given(createVariable("id", "1001"));
 
-        when(http().client(fruitStoreClient)
+        $.when(http().client(fruitStoreClient)
                 .send()
                 .get("/api/fruits/${id}")
                 .message()
                 .contentType(MediaType.APPLICATION_JSON_VALUE));
 
-        then(http().client(fruitStoreClient)
+        $.then(http().client(fruitStoreClient)
                 .receive()
                 .response(HttpStatus.OK)
                 .validate(new JsonMappingValidationProcessor<Fruit>(Fruit.class) {
                     @Override
                     public void validate(Fruit fruit, Map<String, Object> headers, TestContext context) {
-                        Assert.assertEquals("Pineapple", fruit.getName());
-                        Assert.assertEquals("tropical", fruit.getCategory().getName());
+                        Assertions.assertEquals("Pineapple", fruit.getName());
+                        Assertions.assertEquals("tropical", fruit.getCategory().getName());
                     }
                 }));
     }

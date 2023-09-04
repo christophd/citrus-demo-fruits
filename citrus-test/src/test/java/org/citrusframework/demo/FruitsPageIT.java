@@ -19,16 +19,19 @@ package org.citrusframework.demo;
 
 import java.math.BigDecimal;
 
+import org.citrusframework.GherkinTestActionRunner;
+import org.citrusframework.annotations.CitrusResource;
 import org.citrusframework.annotations.CitrusTest;
-import org.citrusframework.http.client.HttpClient;
-import org.citrusframework.junit.spring.JUnit4CitrusSpringSupport;
-import org.citrusframework.selenium.endpoint.SeleniumBrowser;
+import org.citrusframework.config.CitrusSpringConfig;
 import org.citrusframework.demo.config.EndpointConfig;
 import org.citrusframework.demo.fruits.model.Category;
 import org.citrusframework.demo.fruits.model.Fruit;
 import org.citrusframework.demo.fruits.model.Nutrition;
 import org.citrusframework.demo.page.FruitsPage;
-import org.junit.Test;
+import org.citrusframework.http.client.HttpClient;
+import org.citrusframework.junit.jupiter.spring.CitrusSpringSupport;
+import org.citrusframework.selenium.endpoint.SeleniumBrowser;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
@@ -37,8 +40,9 @@ import static org.citrusframework.selenium.actions.SeleniumActionBuilder.seleniu
 /**
  * @author Christoph Deppisch
  */
-@ContextConfiguration(classes = EndpointConfig.class)
-public class FruitsPageIT extends JUnit4CitrusSpringSupport {
+@CitrusSpringSupport
+@ContextConfiguration(classes = { CitrusSpringConfig.class, EndpointConfig.class })
+public class FruitsPageIT {
 
     @Autowired
     private SeleniumBrowser browser;
@@ -48,29 +52,29 @@ public class FruitsPageIT extends JUnit4CitrusSpringSupport {
 
     @Test
     @CitrusTest
-    public void shouldSaveFruitWithForm() {
+    public void shouldSaveFruitWithForm(@CitrusResource GherkinTestActionRunner $) {
         Fruit fruit = TestHelper.createFruit("Grapefruit",
                 new Category(2L, "tropical"), new Nutrition(21, 3), Fruit.Status.PENDING, "juicy,healthy");
         fruit.setDescription("Not everybody likes it");
         fruit.setPrice(BigDecimal.valueOf(1.59D));
         FruitsPage page = new FruitsPage(fruit);
 
-        given(selenium()
+        $.given(selenium()
                 .browser(browser)
                 .start());
 
-        given(selenium()
+        $.given(selenium()
                 .navigate(fruitStoreClient.getEndpointConfiguration().getRequestUrl()));
 
-        given(selenium()
+        $.given(selenium()
                 .page(page)
                 .validate());
 
-        when(selenium()
+        $.when(selenium()
                 .page(page)
                 .execute("addFruit"));
 
-        given(selenium()
+        $.given(selenium()
                 .page(page)
                 .validate());
     }

@@ -19,21 +19,25 @@ package org.citrusframework.demo;
 
 import javax.sql.DataSource;
 
+import org.citrusframework.GherkinTestActionRunner;
+import org.citrusframework.annotations.CitrusResource;
 import org.citrusframework.annotations.CitrusTest;
-import org.citrusframework.http.client.HttpClient;
-import org.citrusframework.junit.spring.JUnit4CitrusSpringSupport;
-import org.citrusframework.kafka.endpoint.KafkaEndpoint;
-import org.citrusframework.kafka.message.KafkaMessageHeaders;
+import org.citrusframework.config.CitrusSpringConfig;
 import org.citrusframework.demo.behavior.AddFruitBehavior;
 import org.citrusframework.demo.config.EndpointConfig;
 import org.citrusframework.demo.fruits.model.Category;
 import org.citrusframework.demo.fruits.model.Fruit;
 import org.citrusframework.demo.fruits.model.Nutrition;
-import org.junit.Test;
+import org.citrusframework.http.client.HttpClient;
+import org.citrusframework.junit.jupiter.spring.CitrusSpringSupport;
+import org.citrusframework.kafka.endpoint.KafkaEndpoint;
+import org.citrusframework.kafka.message.KafkaMessageHeaders;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 
+import static org.citrusframework.actions.ApplyTestBehaviorAction.Builder.apply;
 import static org.citrusframework.actions.ExecuteSQLQueryAction.Builder.query;
 import static org.citrusframework.actions.ReceiveMessageAction.Builder.receive;
 import static org.citrusframework.container.RepeatOnErrorUntilTrue.Builder.repeatOnError;
@@ -42,8 +46,9 @@ import static org.citrusframework.http.actions.HttpActionBuilder.http;
 /**
  * @author Christoph Deppisch
  */
-@ContextConfiguration(classes = EndpointConfig.class)
-public class DeleteFruitsIT extends JUnit4CitrusSpringSupport {
+@CitrusSpringSupport
+@ContextConfiguration(classes = { CitrusSpringConfig.class, EndpointConfig.class })
+public class DeleteFruitsIT {
 
     @Autowired
     private HttpClient fruitStoreClient;
@@ -56,39 +61,39 @@ public class DeleteFruitsIT extends JUnit4CitrusSpringSupport {
 
     @Test
     @CitrusTest
-    public void shouldDeleteFruits() {
+    public void shouldDeleteFruits(@CitrusResource GherkinTestActionRunner $) {
         Fruit fruit = TestHelper.createFruit("Watermelon",
                 new Category("melon"), new Nutrition(19, 5), Fruit.Status.PENDING, "juicy");
 
-        given(applyBehavior(new AddFruitBehavior(fruit, fruitStoreClient)));
+        $.given(apply().behavior(new AddFruitBehavior(fruit, fruitStoreClient)));
 
-        then(receive(fruitEvents)
+        $.then(receive(fruitEvents)
                 .message()
                 .header(KafkaMessageHeaders.MESSAGE_KEY, "${id}")
                 .body("added::" + fruit.getId()));
 
-        then(repeatOnError()
+        $.then(repeatOnError()
             .autoSleep(1000L)
             .until((i, context) -> i > 5)
             .actions(query(fruitsDataSource)
                 .statement("SELECT count(id) as found_records FROM fruit WHERE id=${id}")
                 .validate("found_records", "1")));
 
-        when(http().client(fruitStoreClient)
+        $.when(http().client(fruitStoreClient)
             .send()
             .delete("/api/fruits/${id}")
             .fork(true));
 
-        then(receive(fruitEvents)
+        $.then(receive(fruitEvents)
                 .message()
                 .header(KafkaMessageHeaders.MESSAGE_KEY, "${id}")
                 .body("removed::" + fruit.getId()));
 
-        then(http().client(fruitStoreClient)
+        $.then(http().client(fruitStoreClient)
                 .receive()
                 .response(HttpStatus.NO_CONTENT));
 
-        then(query(fruitsDataSource)
+        $.then(query(fruitsDataSource)
                 .statement("SELECT count(id) as found_records FROM fruit WHERE id=${id}")
                 .validate("found_records", "0"));
     }

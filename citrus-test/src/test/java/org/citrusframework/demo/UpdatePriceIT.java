@@ -19,21 +19,25 @@ package org.citrusframework.demo;
 
 import javax.sql.DataSource;
 
+import org.citrusframework.GherkinTestActionRunner;
+import org.citrusframework.annotations.CitrusResource;
 import org.citrusframework.annotations.CitrusTest;
-import org.citrusframework.http.client.HttpClient;
-import org.citrusframework.http.server.HttpServer;
-import org.citrusframework.junit.spring.JUnit4CitrusSpringSupport;
+import org.citrusframework.config.CitrusSpringConfig;
 import org.citrusframework.demo.behavior.AddFruitBehavior;
 import org.citrusframework.demo.config.EndpointConfig;
 import org.citrusframework.demo.fruits.model.Category;
 import org.citrusframework.demo.fruits.model.Fruit;
 import org.citrusframework.demo.fruits.model.Nutrition;
-import org.junit.Test;
+import org.citrusframework.http.client.HttpClient;
+import org.citrusframework.http.server.HttpServer;
+import org.citrusframework.junit.jupiter.spring.CitrusSpringSupport;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 
+import static org.citrusframework.actions.ApplyTestBehaviorAction.Builder.apply;
 import static org.citrusframework.actions.CreateVariablesAction.Builder.createVariable;
 import static org.citrusframework.actions.ExecuteSQLQueryAction.Builder.query;
 import static org.citrusframework.http.actions.HttpActionBuilder.http;
@@ -41,8 +45,9 @@ import static org.citrusframework.http.actions.HttpActionBuilder.http;
 /**
  * @author Christoph Deppisch
  */
-@ContextConfiguration(classes = EndpointConfig.class)
-public class UpdatePriceIT extends JUnit4CitrusSpringSupport {
+@CitrusSpringSupport
+@ContextConfiguration(classes = { CitrusSpringConfig.class, EndpointConfig.class })
+public class UpdatePriceIT {
 
     @Autowired
     private HttpClient fruitStoreClient;
@@ -55,36 +60,36 @@ public class UpdatePriceIT extends JUnit4CitrusSpringSupport {
 
     @Test
     @CitrusTest
-    public void shouldUpdatePrice() {
+    public void shouldUpdatePrice(@CitrusResource GherkinTestActionRunner $) {
         Fruit fruit = TestHelper.createFruit("Peach",
                 new Category( "pomme"), new Nutrition(48, 10), Fruit.Status.PENDING, "summer");
 
-        given(createVariable("price", "0.99"));
-        given(applyBehavior(new AddFruitBehavior(fruit, fruitStoreClient)));
+        $.given(createVariable("price", "0.99"));
+        $.given(apply().behavior(new AddFruitBehavior(fruit, fruitStoreClient)));
 
-        when(http().client(fruitStoreClient)
+        $.when(http().client(fruitStoreClient)
                 .send()
                 .get("/api/fruits/price/" + fruit.getId())
                 .fork(true)
                 .message()
                 .contentType(MediaType.APPLICATION_JSON_VALUE));
 
-        then(http().server(foodMarketService)
+        $.then(http().server(foodMarketService)
                 .receive()
                 .get("/market/fruits/price/" + fruit.getName().toLowerCase()));
 
-        then(http().server(foodMarketService)
+        $.then(http().server(foodMarketService)
                 .send()
                 .response(HttpStatus.OK)
                 .message()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body("{ \"name\": \"" + fruit.getName().toLowerCase() + "\", \"value\": ${price} }"));
 
-        then(http().client(fruitStoreClient)
+        $.then(http().client(fruitStoreClient)
                 .receive()
                 .response(HttpStatus.OK));
 
-        then(query(fruitsDataSource)
+        $.then(query(fruitsDataSource)
                 .statement("SELECT id, price FROM fruit WHERE id=${id}")
                 .validate("price", "${price}"));
     }

@@ -19,29 +19,33 @@ package org.citrusframework.demo;
 
 import javax.sql.DataSource;
 
+import org.citrusframework.GherkinTestActionRunner;
+import org.citrusframework.annotations.CitrusResource;
 import org.citrusframework.annotations.CitrusTest;
-import org.citrusframework.http.client.HttpClient;
-import org.citrusframework.junit.spring.JUnit4CitrusSpringSupport;
-import org.citrusframework.message.builder.ObjectMappingPayloadBuilder;
+import org.citrusframework.config.CitrusSpringConfig;
 import org.citrusframework.demo.config.EndpointConfig;
 import org.citrusframework.demo.fruits.model.Category;
 import org.citrusframework.demo.fruits.model.Fruit;
 import org.citrusframework.demo.fruits.model.Nutrition;
-import org.junit.Test;
+import org.citrusframework.http.client.HttpClient;
+import org.citrusframework.junit.jupiter.spring.CitrusSpringSupport;
+import org.citrusframework.message.builder.ObjectMappingPayloadBuilder;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 
-import static org.citrusframework.actions.ExecuteSQLQueryAction.Builder.query;
+import static org.citrusframework.actions.ExecuteSQLAction.Builder.sql;
 import static org.citrusframework.dsl.JsonPathSupport.jsonPath;
 import static org.citrusframework.http.actions.HttpActionBuilder.http;
 
 /**
  * @author Christoph Deppisch
  */
-@ContextConfiguration(classes = EndpointConfig.class)
-public class PersistFruitsIT extends JUnit4CitrusSpringSupport {
+@CitrusSpringSupport
+@ContextConfiguration(classes = { CitrusSpringConfig.class, EndpointConfig.class })
+public class PersistFruitsIT {
 
     @Autowired
     private HttpClient fruitStoreClient;
@@ -51,25 +55,26 @@ public class PersistFruitsIT extends JUnit4CitrusSpringSupport {
 
     @Test
     @CitrusTest
-    public void shouldPersistFruits() {
+    public void shouldPersistFruits(@CitrusResource GherkinTestActionRunner $) {
         Fruit fruit = TestHelper.createFruit("Nectarine",
                 new Category( "pomme"), new Nutrition(62, 12), Fruit.Status.PENDING, "summer");
 
-        when(http().client(fruitStoreClient)
+        $.when(http().client(fruitStoreClient)
                 .send()
                 .post("/api/fruits")
                 .message()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(new ObjectMappingPayloadBuilder(fruit)));
 
-        then(http().client(fruitStoreClient)
+        $.then(http().client(fruitStoreClient)
                 .receive()
                 .response(HttpStatus.CREATED)
                 .message()
                 .extract(jsonPath()
                             .expression("$.id", "id")));
 
-        then(query(fruitsDataSource)
+        $.then(sql().dataSource(fruitsDataSource)
+            .query()
             .statement("SELECT id, name FROM fruit WHERE id=${id}")
             .validate("name", fruit.getName()));
     }
