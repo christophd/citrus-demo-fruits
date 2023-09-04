@@ -28,6 +28,8 @@ import org.citrusframework.demo.fruits.model.Fruit;
 import org.citrusframework.demo.fruits.model.Nutrition;
 import org.citrusframework.http.client.HttpClient;
 import org.citrusframework.junit.jupiter.spring.CitrusSpringSupport;
+import org.citrusframework.kafka.endpoint.KafkaEndpoint;
+import org.citrusframework.kafka.message.KafkaMessageHeaders;
 import org.citrusframework.message.builder.ObjectMappingPayloadBuilder;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,8 +38,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 
-import static org.citrusframework.http.actions.HttpActionBuilder.http;
 import static org.citrusframework.actions.ApplyTestBehaviorAction.Builder.apply;
+import static org.citrusframework.actions.ReceiveMessageAction.Builder.receive;
+import static org.citrusframework.http.actions.HttpActionBuilder.http;
 
 /**
  * @author Christoph Deppisch
@@ -48,6 +51,9 @@ public class AddFruitsIT {
 
     @Autowired
     private HttpClient fruitStoreClient;
+
+    @Autowired
+    private KafkaEndpoint fruitEvents;
 
     @Test
     @CitrusTest
@@ -119,5 +125,10 @@ public class AddFruitsIT {
                 new Category("berry"), new Nutrition(42, 9), Fruit.Status.PENDING, "smoothie");
 
         $.given(apply().behavior(new AddFruitBehavior(fruit, fruitStoreClient)));
+
+        $.then(receive(fruitEvents)
+                .message()
+                .header(KafkaMessageHeaders.MESSAGE_KEY, "${id}")
+                .body("added::${id}"));
     }
 }
