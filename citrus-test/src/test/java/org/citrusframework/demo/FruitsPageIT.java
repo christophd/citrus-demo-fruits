@@ -17,13 +17,16 @@
 
 package org.citrusframework.demo;
 
+import java.math.BigDecimal;
+
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.http.client.HttpClient;
-import com.consol.citrus.junit.JUnit4CitrusSupport;
+import com.consol.citrus.junit.spring.JUnit4CitrusSpringSupport;
 import com.consol.citrus.selenium.endpoint.SeleniumBrowser;
 import org.citrusframework.demo.config.EndpointConfig;
 import org.citrusframework.demo.fruits.model.Category;
 import org.citrusframework.demo.fruits.model.Fruit;
+import org.citrusframework.demo.fruits.model.Nutrition;
 import org.citrusframework.demo.page.FruitsPage;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +38,7 @@ import static com.consol.citrus.selenium.actions.SeleniumActionBuilder.selenium;
  * @author Christoph Deppisch
  */
 @ContextConfiguration(classes = EndpointConfig.class)
-public class FruitsPageIT extends JUnit4CitrusSupport {
+public class FruitsPageIT extends JUnit4CitrusSpringSupport {
 
     @Autowired
     private SeleniumBrowser browser;
@@ -45,10 +48,11 @@ public class FruitsPageIT extends JUnit4CitrusSupport {
 
     @Test
     @CitrusTest
-    public void shouldGetFruitsWithModel() {
+    public void shouldSaveFruitWithForm() {
         Fruit fruit = TestHelper.createFruit("Grapefruit",
-                new Category(2L, "tropical"), Fruit.Status.PENDING, "juicy,healthy");
+                new Category(2L, "tropical"), new Nutrition(21, 3), Fruit.Status.PENDING, "juicy,healthy");
         fruit.setDescription("Not everybody likes it");
+        fruit.setPrice(BigDecimal.valueOf(1.59D));
         FruitsPage page = new FruitsPage(fruit);
 
         given(selenium()

@@ -17,17 +17,25 @@
 
 package org.citrusframework.demo.fruits;
 
-import javax.enterprise.context.ApplicationScoped;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.smallrye.reactive.messaging.annotations.Broadcast;
+import io.smallrye.reactive.messaging.annotations.Merge;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.citrusframework.demo.fruits.model.Fruit;
+import org.eclipse.microprofile.reactive.messaging.Incoming;
+import org.eclipse.microprofile.reactive.messaging.Outgoing;
 import org.jboss.logging.Logger;
 
 /**
@@ -38,12 +46,24 @@ public class FruitEvents {
 
     private static final Logger LOG = Logger.getLogger(FruitEvents.class);
 
+    @Inject
+    ObjectMapper mapper;
+
     public void onAdded(String id) {
         sendEvent(id, "added::" + id);
     }
 
     public void onRemoved(String id) {
         sendEvent(id, "removed::" + id);
+    }
+
+    @Incoming("fruit-events")
+    @Outgoing("fruit-events-stream")
+    @Merge
+    @Broadcast
+    public String processEvent(Fruit fruit) throws JsonProcessingException {
+        LOG.info("Processing fruit id:" + fruit.getId());
+        return mapper.writeValueAsString(fruit);
     }
 
     private void sendEvent(String id, String value) {

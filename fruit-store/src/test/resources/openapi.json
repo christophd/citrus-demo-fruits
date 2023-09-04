@@ -1,12 +1,20 @@
 {
   "openapi" : "3.0.3",
   "info" : {
-    "title" : "Generated API",
-    "version" : "1.0"
+    "title" : "fruit-store API",
+    "version" : "1.0-SNAPSHOT"
   },
+  "servers" : [ {
+    "url" : "http://localhost:8080",
+    "description" : "Auto generated value"
+  }, {
+    "url" : "http://0.0.0.0:8080",
+    "description" : "Auto generated value"
+  } ],
   "paths" : {
     "/" : {
       "get" : {
+        "tags" : [ "Web Resource" ],
         "responses" : {
           "200" : {
             "description" : "OK",
@@ -21,6 +29,7 @@
         }
       },
       "post" : {
+        "tags" : [ "Web Resource" ],
         "requestBody" : {
           "content" : {
             "application/x-www-form-urlencoded" : {
@@ -34,7 +43,7 @@
           "200" : {
             "description" : "OK",
             "content" : {
-              "text/html" : {
+              "application/json" : {
                 "schema" : {
                   "$ref" : "#/components/schemas/TemplateInstance"
                 }
@@ -44,8 +53,9 @@
         }
       }
     },
-    "/fruits" : {
+    "/api/fruits" : {
       "get" : {
+        "tags" : [ "Fruit Resource" ],
         "operationId" : "listFruits",
         "responses" : {
           "200" : {
@@ -53,7 +63,10 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/ListFruit"
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/Fruit"
+                  }
                 }
               }
             }
@@ -61,6 +74,7 @@
         }
       },
       "post" : {
+        "tags" : [ "Fruit Resource" ],
         "operationId" : "addFruit",
         "requestBody" : {
           "content" : {
@@ -78,8 +92,28 @@
         }
       }
     },
-    "/fruits/price/{id}" : {
+    "/api/fruits/nutrition/{id}" : {
       "get" : {
+        "tags" : [ "Fruit Resource" ],
+        "operationId" : "getNutrition",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          }
+        }
+      }
+    },
+    "/api/fruits/price/{id}" : {
+      "get" : {
+        "tags" : [ "Fruit Resource" ],
         "operationId" : "getPriceUpdate",
         "parameters" : [ {
           "name" : "id",
@@ -96,8 +130,9 @@
         }
       }
     },
-    "/fruits/{id}" : {
+    "/api/fruits/{id}" : {
       "get" : {
+        "tags" : [ "Fruit Resource" ],
         "operationId" : "getFruitById",
         "parameters" : [ {
           "name" : "id",
@@ -114,6 +149,7 @@
         }
       },
       "delete" : {
+        "tags" : [ "Fruit Resource" ],
         "operationId" : "deleteFruit",
         "parameters" : [ {
           "name" : "id",
@@ -129,19 +165,27 @@
           }
         }
       }
+    },
+    "/fruits" : {
+      "get" : {
+        "tags" : [ "Web Resource" ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "text/event-stream" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PublisherString"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components" : {
     "schemas" : {
-      "MultivaluedMapStringString" : {
-        "type" : "object",
-        "additionalProperties" : {
-          "type" : "string"
-        }
-      },
-      "TemplateInstance" : {
-        "type" : "object"
-      },
       "Category" : {
         "type" : "object",
         "properties" : {
@@ -154,28 +198,60 @@
           }
         }
       },
-      "BigDecimal" : {
-        "type" : "number"
+      "Charset" : {
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string"
+          },
+          "aliases" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "aliasSet" : {
+            "uniqueItems" : true,
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "registered" : {
+            "type" : "boolean"
+          }
+        }
       },
-      "Status" : {
-        "enum" : [ "AVAILABLE", "PENDING", "SOLD" ],
-        "type" : "string"
-      },
-      "ListString" : {
-        "type" : "array",
-        "items" : {
-          "type" : "string"
+      "Expression" : {
+        "type" : "object",
+        "properties" : {
+          "namespace" : {
+            "type" : "string"
+          },
+          "parts" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/Part"
+            }
+          },
+          "literal" : {
+            "type" : "boolean"
+          },
+          "literalValue" : {
+            "type" : "object"
+          },
+          "origin" : {
+            "$ref" : "#/components/schemas/Origin"
+          },
+          "generatedId" : {
+            "format" : "int32",
+            "type" : "integer"
+          }
         }
       },
       "Fruit" : {
         "type" : "object",
         "properties" : {
-          "category" : {
-            "$ref" : "#/components/schemas/Category"
-          },
-          "description" : {
-            "type" : "string"
-          },
           "id" : {
             "format" : "int64",
             "type" : "integer"
@@ -183,21 +259,250 @@
           "name" : {
             "type" : "string"
           },
-          "price" : {
-            "$ref" : "#/components/schemas/BigDecimal"
+          "description" : {
+            "type" : "string"
+          },
+          "category" : {
+            "$ref" : "#/components/schemas/Category"
+          },
+          "tags" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
           },
           "status" : {
             "$ref" : "#/components/schemas/Status"
           },
-          "tags" : {
-            "$ref" : "#/components/schemas/ListString"
+          "nutrition" : {
+            "$ref" : "#/components/schemas/Nutrition"
+          },
+          "price" : {
+            "type" : "number"
           }
         }
       },
-      "ListFruit" : {
-        "type" : "array",
-        "items" : {
-          "$ref" : "#/components/schemas/Fruit"
+      "Locale" : {
+        "type" : "object",
+        "properties" : {
+          "language" : {
+            "type" : "string"
+          },
+          "script" : {
+            "type" : "string"
+          },
+          "country" : {
+            "type" : "string"
+          },
+          "variant" : {
+            "type" : "string"
+          },
+          "extensionKeys" : {
+            "uniqueItems" : true,
+            "type" : "array",
+            "items" : {
+              "format" : "byte",
+              "type" : "string"
+            }
+          },
+          "unicodeLocaleAttributes" : {
+            "uniqueItems" : true,
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "unicodeLocaleKeys" : {
+            "uniqueItems" : true,
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "iSO3Language" : {
+            "type" : "string"
+          },
+          "iSO3Country" : {
+            "type" : "string"
+          },
+          "displayLanguage" : {
+            "type" : "string"
+          },
+          "displayScript" : {
+            "type" : "string"
+          },
+          "displayCountry" : {
+            "type" : "string"
+          },
+          "displayVariant" : {
+            "type" : "string"
+          },
+          "displayName" : {
+            "type" : "string"
+          }
+        }
+      },
+      "MultivaluedMapStringString" : {
+        "type" : "object",
+        "additionalProperties" : {
+          "type" : "array",
+          "items" : {
+            "type" : "string"
+          }
+        }
+      },
+      "Nutrition" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "calories" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "sugar" : {
+            "format" : "int32",
+            "type" : "integer"
+          }
+        }
+      },
+      "Origin" : {
+        "type" : "object",
+        "properties" : {
+          "line" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "lineCharacterStart" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "lineCharacterEnd" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "templateId" : {
+            "type" : "string"
+          },
+          "templateGeneratedId" : {
+            "type" : "string"
+          },
+          "variant" : {
+            "type" : "object",
+            "allOf" : [ {
+              "$ref" : "#/components/schemas/Variant"
+            } ],
+            "nullable" : true
+          }
+        }
+      },
+      "ParameterDeclaration" : {
+        "type" : "object",
+        "properties" : {
+          "typeInfo" : {
+            "type" : "string"
+          },
+          "key" : {
+            "type" : "string"
+          },
+          "defaultValue" : {
+            "$ref" : "#/components/schemas/Expression"
+          },
+          "origin" : {
+            "$ref" : "#/components/schemas/Origin"
+          }
+        }
+      },
+      "Part" : {
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string"
+          },
+          "typeInfo" : {
+            "type" : "string"
+          },
+          "virtualMethod" : {
+            "type" : "boolean"
+          }
+        }
+      },
+      "PublisherString" : {
+        "type" : "object"
+      },
+      "Status" : {
+        "enum" : [ "SOLD", "PENDING", "AVAILABLE" ],
+        "type" : "string"
+      },
+      "Template" : {
+        "type" : "object",
+        "properties" : {
+          "expressions" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/Expression"
+            }
+          },
+          "generatedId" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "string"
+          },
+          "variant" : {
+            "type" : "object",
+            "allOf" : [ {
+              "$ref" : "#/components/schemas/Variant"
+            } ],
+            "nullable" : true
+          },
+          "parameterDeclarations" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/ParameterDeclaration"
+            }
+          },
+          "fragment" : {
+            "type" : "boolean"
+          }
+        }
+      },
+      "TemplateInstance" : {
+        "type" : "object",
+        "properties" : {
+          "timeout" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "template" : {
+            "$ref" : "#/components/schemas/Template"
+          }
+        }
+      },
+      "Variant" : {
+        "type" : "object",
+        "properties" : {
+          "locale" : {
+            "$ref" : "#/components/schemas/Locale"
+          },
+          "contentType" : {
+            "type" : "string"
+          },
+          "encoding" : {
+            "$ref" : "#/components/schemas/Charset"
+          },
+          "hashCode" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "mediaType" : {
+            "type" : "string"
+          },
+          "charset" : {
+            "$ref" : "#/components/schemas/Charset"
+          }
         }
       }
     }

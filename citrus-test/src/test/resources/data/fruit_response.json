@@ -6,6 +6,11 @@
     "id": 2,
     "name": "tropical"
   },
+  "nutrition":{
+    "id": 2,
+    "calories": 97,
+    "sugar": 14
+  },
   "status": "PENDING",
   "price": 1.99,
   "tags": ["cocktail"]

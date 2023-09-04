@@ -22,11 +22,12 @@ import javax.sql.DataSource;
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.http.client.HttpClient;
 import com.consol.citrus.http.server.HttpServer;
-import com.consol.citrus.junit.JUnit4CitrusSupport;
+import com.consol.citrus.junit.spring.JUnit4CitrusSpringSupport;
 import org.citrusframework.demo.behavior.AddFruitBehavior;
 import org.citrusframework.demo.config.EndpointConfig;
 import org.citrusframework.demo.fruits.model.Category;
 import org.citrusframework.demo.fruits.model.Fruit;
+import org.citrusframework.demo.fruits.model.Nutrition;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -41,13 +42,13 @@ import static com.consol.citrus.http.actions.HttpActionBuilder.http;
  * @author Christoph Deppisch
  */
 @ContextConfiguration(classes = EndpointConfig.class)
-public class UpdatePriceIT extends JUnit4CitrusSupport {
+public class UpdatePriceIT extends JUnit4CitrusSpringSupport {
 
     @Autowired
     private HttpClient fruitStoreClient;
 
     @Autowired
-    private HttpServer marketPriceService;
+    private HttpServer foodMarketService;
 
     @Autowired
     private DataSource fruitsDataSource;
@@ -56,26 +57,28 @@ public class UpdatePriceIT extends JUnit4CitrusSupport {
     @CitrusTest
     public void shouldUpdatePrice() {
         Fruit fruit = TestHelper.createFruit("Peach",
-                new Category( "pomme"), Fruit.Status.PENDING, "summer");
+                new Category( "pomme"), new Nutrition(48, 10), Fruit.Status.PENDING, "summer");
 
         given(createVariable("price", "0.99"));
         given(applyBehavior(new AddFruitBehavior(fruit, fruitStoreClient)));
 
         when(http().client(fruitStoreClient)
                 .send()
-                .get("/fruits/price/" + fruit.getId())
+                .get("/api/fruits/price/" + fruit.getId())
                 .fork(true)
+                .message()
                 .contentType(MediaType.APPLICATION_JSON_VALUE));
 
-        then(http().server(marketPriceService)
+        then(http().server(foodMarketService)
                 .receive()
-                .get("/prices/fruits/" + fruit.getName().toLowerCase()));
+                .get("/market/fruits/price/" + fruit.getName().toLowerCase()));
 
-        then(http().server(marketPriceService)
+        then(http().server(foodMarketService)
                 .send()
                 .response(HttpStatus.OK)
+                .message()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .payload("{ \"name\": \"" + fruit.getName().toLowerCase() + "\", \"value\": ${price} }"));
+                .body("{ \"name\": \"" + fruit.getName().toLowerCase() + "\", \"value\": ${price} }"));
 
         then(http().client(fruitStoreClient)
                 .receive()

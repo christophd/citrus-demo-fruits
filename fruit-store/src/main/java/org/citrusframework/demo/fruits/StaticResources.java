@@ -17,23 +17,21 @@
 
 package org.citrusframework.demo.fruits;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.enterprise.event.Observes;
 
-import org.citrusframework.demo.fruits.model.Price;
-import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
+import io.quarkus.runtime.StartupEvent;
+import io.vertx.ext.web.Router;
+import io.vertx.ext.web.handler.StaticHandler;
 
-/**
- * @author Christoph Deppisch
- */
-@Path("/prices")
-@RegisterRestClient(configKey="market-client")
-public interface MarketClient {
+public class StaticResources {
 
-    @GET
-    @Path("/fruits/{name}")
-    @Produces("application/json")
-    Price getByName(@PathParam("name") String name);
+    void installRoute(@Observes StartupEvent startupEvent, Router router) {
+        router.route()
+                .path("/scripts/*")
+                .handler(StaticHandler.create("scripts/"));
+
+        router.route()
+                .path("/styles/*")
+                .handler(StaticHandler.create("styles/"));
+    }
 }

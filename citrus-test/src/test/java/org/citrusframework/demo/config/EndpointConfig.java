@@ -42,7 +42,7 @@ import static com.consol.citrus.actions.PurgeEndpointAction.Builder.purgeEndpoin
 public class EndpointConfig {
 
     private static final int FRUIT_STORE_SERVICE_PORT = 8080;
-    private static final int MARKET_SERVICE_PORT = 8081;
+    private static final int FOOD_MARKET_SERVICE_PORT = 8081;
     private static final int KAFKA_BROKER_PORT = 9090;
 
     @Bean
@@ -53,9 +53,9 @@ public class EndpointConfig {
     }
 
     @Bean
-    public HttpServer marketPriceService() {
+    public HttpServer foodMarketService() {
         return new HttpServerBuilder()
-                .port(MARKET_SERVICE_PORT)
+                .port(FOOD_MARKET_SERVICE_PORT)
                 .autoStart(true)
             .build();
     }

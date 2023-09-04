@@ -50,6 +50,12 @@ public class FruitsPage implements WebPage, PageValidator<FruitsPage> {
     @FindBy(id="price")
     private WebElement price;
 
+    @FindBy(id="calories")
+    private WebElement calories;
+
+    @FindBy(id="sugar")
+    private WebElement sugar;
+
     @FindBy(id="tags")
     private WebElement tags;
 
@@ -76,6 +82,14 @@ public class FruitsPage implements WebPage, PageValidator<FruitsPage> {
         tags.sendKeys(String.join(",", fruit.getTags()));
 
         new Select(status).selectByValue(fruit.getStatus().name());
+
+        if (fruit.getNutrition() != null) {
+            calories.clear();
+            calories.sendKeys(fruit.getNutrition().getCalories().toString());
+
+            sugar.clear();
+            sugar.sendKeys(fruit.getNutrition().getSugar().toString());
+        }
 
         saveButton.click();
     }

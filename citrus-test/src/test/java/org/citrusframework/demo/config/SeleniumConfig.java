@@ -24,7 +24,7 @@ import com.consol.citrus.container.SequenceAfterTest;
 import com.consol.citrus.context.TestContext;
 import com.consol.citrus.selenium.endpoint.SeleniumBrowser;
 import com.consol.citrus.selenium.endpoint.SeleniumBrowserBuilder;
-import org.openqa.selenium.remote.BrowserType;
+import org.openqa.selenium.remote.Browser;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
@@ -41,7 +41,7 @@ public class SeleniumConfig {
     @Bean
     public SeleniumBrowser browser() {
         return new SeleniumBrowserBuilder()
-                .type(BrowserType.CHROME)
+                .type(Browser.HTMLUNIT.browserName())
                 .build();
     }
 

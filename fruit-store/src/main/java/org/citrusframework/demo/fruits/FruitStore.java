@@ -17,20 +17,21 @@
 
 package org.citrusframework.demo.fruits;
 
+import java.math.BigDecimal;
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.transaction.Transactional;
-import java.math.BigDecimal;
-import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 import org.citrusframework.demo.fruits.model.Category;
 import org.citrusframework.demo.fruits.model.Fruit;
+import org.citrusframework.demo.fruits.model.Nutrition;
 import org.h2.tools.Server;
 
 /**
@@ -53,6 +54,7 @@ public class FruitStore {
         Fruit apple = new Fruit("Apple", "Winter fruit");
         apple.setCategory(pome);
         apple.setTags(Arrays.asList("winter", "juicy"));
+        apple.setNutrition(new Nutrition(52, 10));
         apple.setPrice(new BigDecimal("1.59"));
         apple.setStatus(Fruit.Status.AVAILABLE);
         add(apple);
@@ -60,6 +62,7 @@ public class FruitStore {
         Fruit pineapple = new Fruit("Pineapple", "Tropical fruit");
         pineapple.setTags(Collections.singletonList("cocktail"));
         pineapple.setCategory(tropical);
+        pineapple.setNutrition(new Nutrition(97, 14));
         pineapple.setPrice(new BigDecimal("1.99"));
         add(pineapple);
 
@@ -68,6 +71,7 @@ public class FruitStore {
         strawberry.setCategory(berry);
         strawberry.setStatus(Fruit.Status.SOLD);
         strawberry.setPrice(new BigDecimal("2.55"));
+        strawberry.setNutrition(new Nutrition(29, 5));
         add(strawberry);
     }
 
@@ -106,8 +110,14 @@ public class FruitStore {
     }
 
     @Transactional
-    public void remove(Long id) {
-        em.remove(findById(id));
+    public boolean remove(Long id) {
+        try {
+            em.remove(findById(id));
+        } catch(NoResultException e) {
+            return false;
+        }
+
+        return true;
     }
 
     public List<Category> getCategories() {

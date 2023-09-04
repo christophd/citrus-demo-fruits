@@ -21,11 +21,12 @@ import javax.sql.DataSource;
 
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.http.client.HttpClient;
-import com.consol.citrus.junit.JUnit4CitrusSupport;
+import com.consol.citrus.junit.spring.JUnit4CitrusSpringSupport;
 import com.consol.citrus.message.builder.ObjectMappingPayloadBuilder;
 import org.citrusframework.demo.config.EndpointConfig;
 import org.citrusframework.demo.fruits.model.Category;
 import org.citrusframework.demo.fruits.model.Fruit;
+import org.citrusframework.demo.fruits.model.Nutrition;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,14 +34,14 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 
 import static com.consol.citrus.actions.ExecuteSQLQueryAction.Builder.query;
+import static com.consol.citrus.dsl.JsonPathSupport.jsonPath;
 import static com.consol.citrus.http.actions.HttpActionBuilder.http;
-import static com.consol.citrus.validation.json.JsonPathVariableExtractor.Builder.jsonPathExtractor;
 
 /**
  * @author Christoph Deppisch
  */
 @ContextConfiguration(classes = EndpointConfig.class)
-public class PersistFruitsIT extends JUnit4CitrusSupport {
+public class PersistFruitsIT extends JUnit4CitrusSpringSupport {
 
     @Autowired
     private HttpClient fruitStoreClient;
@@ -52,19 +53,21 @@ public class PersistFruitsIT extends JUnit4CitrusSupport {
     @CitrusTest
     public void shouldPersistFruits() {
         Fruit fruit = TestHelper.createFruit("Nectarine",
-                new Category( "pomme"), Fruit.Status.PENDING, "summer");
+                new Category( "pomme"), new Nutrition(62, 12), Fruit.Status.PENDING, "summer");
 
         when(http().client(fruitStoreClient)
                 .send()
-                .post("/fruits")
+                .post("/api/fruits")
+                .message()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .payload(new ObjectMappingPayloadBuilder(fruit)));
+                .body(new ObjectMappingPayloadBuilder(fruit)));
 
         then(http().client(fruitStoreClient)
                 .receive()
                 .response(HttpStatus.CREATED)
-                .process(jsonPathExtractor()
-                        .expression("$.id", "id")));
+                .message()
+                .extract(jsonPath()
+                            .expression("$.id", "id")));
 
         then(query(fruitsDataSource)
             .statement("SELECT id, name FROM fruit WHERE id=${id}")

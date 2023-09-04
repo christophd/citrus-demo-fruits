@@ -17,6 +17,9 @@
 
 package org.citrusframework.demo.fruits;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.regex.Pattern;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -27,16 +30,16 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.List;
-import java.util.Optional;
-import java.util.regex.Pattern;
 
 import org.citrusframework.demo.fruits.model.Fruit;
+import org.citrusframework.demo.fruits.model.Nutrition;
 import org.citrusframework.demo.fruits.model.Price;
 import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.reactive.messaging.Channel;
+import org.eclipse.microprofile.reactive.messaging.Emitter;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
-@Path("/fruits")
+@Path("/api/fruits")
 @Produces(MediaType.APPLICATION_JSON)
 public class FruitResource {
 
@@ -45,10 +48,14 @@ public class FruitResource {
 
     @Inject
     @RestClient
-    MarketClient marketClient;
+    FoodMarketClient marketClient;
 
     @Inject
     FruitEvents fruitEvents;
+
+    @Inject
+    @Channel("fruit-events")
+    Emitter<Fruit> fruitEventsEmitter;
 
     @GET
     @Operation(operationId = "listFruits")
@@ -58,9 +65,14 @@ public class FruitResource {
 
     @POST
     @Operation(operationId = "addFruit")
-    @Consumes({MediaType.APPLICATION_JSON})
+    @Consumes(MediaType.APPLICATION_JSON)
     public Response add(Fruit fruit) {
         store.add(fruit);
+
+        if (fruitEventsEmitter.hasRequests()) {
+            fruitEventsEmitter.send(fruit);
+        }
+
         fruitEvents.onAdded(fruit.getId().toString());
         return Response.status(Response.Status.CREATED)
                 .entity(fruit).build();
@@ -90,11 +102,33 @@ public class FruitResource {
     @Operation(operationId = "getPriceUpdate")
     public Response updatePrice(@PathParam("id") String id) {
         Response response = find(id);
-        Fruit fruit = (Fruit) response.getEntity();
 
-        if (fruit != null) {
-            Price price = marketClient.getByName(fruit.getName().toLowerCase());
+        if (response.getEntity() != null) {
+            Fruit fruit = (Fruit) response.getEntity();
+            Price price = marketClient.getPrice(fruit.getName().toLowerCase());
             fruit.setPrice(price.value);
+            store.update(fruit);
+            return Response.ok(fruit).build();
+        }
+
+        return response;
+    }
+
+    @GET
+    @Path("/nutrition/{id}")
+    @Operation(operationId = "getNutrition")
+    public Response getNutrition(@PathParam("id") String id) {
+        Response response = find(id);
+
+        if (response.getEntity() != null) {
+            Fruit fruit = (Fruit) response.getEntity();
+            Nutrition nutrition = marketClient.getNutrition(fruit.getName().toLowerCase());
+            if (fruit.getNutrition() != null) {
+                fruit.getNutrition().setSugar(nutrition.getSugar());
+                fruit.getNutrition().setCalories(nutrition.getCalories());
+            } else {
+                fruit.setNutrition(nutrition);
+            }
             store.update(fruit);
             return Response.ok(fruit).build();
         }
@@ -110,9 +144,12 @@ public class FruitResource {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
 
-        store.remove(Long.parseLong(id));
-        fruitEvents.onRemoved(id);
-        return Response.noContent().build();
+        if (store.remove(Long.parseLong(id))) {
+            fruitEvents.onRemoved(id);
+            return Response.noContent().build();
+        }
+
+        return Response.status(Response.Status.NOT_FOUND).build();
     }
 }
 

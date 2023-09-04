@@ -23,12 +23,13 @@ import java.util.Map;
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.context.TestContext;
 import com.consol.citrus.http.client.HttpClient;
-import com.consol.citrus.junit.JUnit4CitrusSupport;
+import com.consol.citrus.junit.spring.JUnit4CitrusSpringSupport;
 import com.consol.citrus.message.builder.ObjectMappingPayloadBuilder;
-import com.consol.citrus.validation.json.JsonMappingValidationCallback;
+import com.consol.citrus.validation.json.JsonMappingValidationProcessor;
 import org.citrusframework.demo.config.EndpointConfig;
 import org.citrusframework.demo.fruits.model.Category;
 import org.citrusframework.demo.fruits.model.Fruit;
+import org.citrusframework.demo.fruits.model.Nutrition;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +46,7 @@ import static com.consol.citrus.validation.json.JsonPathMessageValidationContext
  * @author Christoph Deppisch
  */
 @ContextConfiguration(classes = EndpointConfig.class)
-public class GetFruitsIT extends JUnit4CitrusSupport {
+public class GetFruitsIT extends JUnit4CitrusSpringSupport {
 
     @Autowired
     private HttpClient fruitStoreClient;
@@ -57,19 +58,26 @@ public class GetFruitsIT extends JUnit4CitrusSupport {
 
         when(http().client(fruitStoreClient)
                 .send()
-                .get("/fruits/${id}")
+                .get("/api/fruits/${id}")
+                .message()
                 .contentType(MediaType.APPLICATION_JSON_VALUE));
 
         then(http().client(fruitStoreClient)
                 .receive()
                 .response(HttpStatus.OK)
-                .payload("{" +
+                .message()
+                .body("{" +
                     "\"id\": ${id}," +
                     "\"name\": \"Pineapple\"," +
                     "\"description\": \"@ignore@\"," +
                     "\"category\": {" +
                         "\"id\": 2," +
                         "\"name\":\"tropical\"" +
+                    "}," +
+                    "\"nutrition\": {" +
+                        "\"id\": 2," +
+                        "\"calories\": 97," +
+                        "\"sugar\": 14" +
                     "}," +
                     "\"status\": \"PENDING\"," +
                     "\"price\": \"@greaterThan(0.00)@\"," +
@@ -84,20 +92,22 @@ public class GetFruitsIT extends JUnit4CitrusSupport {
 
         when(http().client(fruitStoreClient)
                 .send()
-                .get("/fruits/${id}")
+                .get("/api/fruits/${id}")
+                .message()
                 .contentType(MediaType.APPLICATION_JSON_VALUE));
 
         then(http().client(fruitStoreClient)
                 .receive()
                 .response(HttpStatus.OK)
-                .payload(new ClassPathResource("data/fruit_response.json")));
+                .message()
+                .body(new ClassPathResource("data/fruit_response.json")));
     }
 
     @Test
     @CitrusTest
     public void shouldGetFruitsWithModel() {
         Fruit fruit = TestHelper.createFruit("Pineapple",
-                new Category(2L, "tropical"), Fruit.Status.PENDING, "cocktail");
+                new Category(2L, "tropical"), new Nutrition(2L, 97, 14), Fruit.Status.PENDING, "cocktail");
 
         fruit.setId(1001L);
         fruit.setDescription("@ignore@");
@@ -105,13 +115,15 @@ public class GetFruitsIT extends JUnit4CitrusSupport {
 
         when(http().client(fruitStoreClient)
                 .send()
-                .get("/fruits/" + fruit.getId())
+                .get("/api/fruits/" + fruit.getId())
+                .message()
                 .contentType(MediaType.APPLICATION_JSON_VALUE));
 
         then(http().client(fruitStoreClient)
                 .receive()
                 .response(HttpStatus.OK)
-                .payload(new ObjectMappingPayloadBuilder(fruit)));
+                .message()
+                .body(new ObjectMappingPayloadBuilder(fruit)));
     }
 
     @Test
@@ -121,7 +133,8 @@ public class GetFruitsIT extends JUnit4CitrusSupport {
 
         when(http().client(fruitStoreClient)
                 .send()
-                .get("/fruits/${id}")
+                .get("/api/fruits/${id}")
+                .message()
                 .contentType(MediaType.APPLICATION_JSON_VALUE));
 
         then(http().client(fruitStoreClient)
@@ -143,13 +156,14 @@ public class GetFruitsIT extends JUnit4CitrusSupport {
 
         when(http().client(fruitStoreClient)
                 .send()
-                .get("/fruits/${id}")
+                .get("/api/fruits/${id}")
+                .message()
                 .contentType(MediaType.APPLICATION_JSON_VALUE));
 
         then(http().client(fruitStoreClient)
                 .receive()
                 .response(HttpStatus.OK)
-                .validationCallback(new JsonMappingValidationCallback<Fruit>(Fruit.class) {
+                .validate(new JsonMappingValidationProcessor<Fruit>(Fruit.class) {
                     @Override
                     public void validate(Fruit fruit, Map<String, Object> headers, TestContext context) {
                         Assert.assertEquals("Pineapple", fruit.getName());

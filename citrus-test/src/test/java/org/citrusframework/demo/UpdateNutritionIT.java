@@ -21,9 +21,8 @@ import javax.sql.DataSource;
 
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.http.client.HttpClient;
+import com.consol.citrus.http.server.HttpServer;
 import com.consol.citrus.junit.spring.JUnit4CitrusSpringSupport;
-import com.consol.citrus.kafka.endpoint.KafkaEndpoint;
-import com.consol.citrus.kafka.message.KafkaMessageHeaders;
 import org.citrusframework.demo.behavior.AddFruitBehavior;
 import org.citrusframework.demo.config.EndpointConfig;
 import org.citrusframework.demo.fruits.model.Category;
@@ -32,65 +31,63 @@ import org.citrusframework.demo.fruits.model.Nutrition;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 
+import static com.consol.citrus.actions.CreateVariablesAction.Builder.createVariable;
 import static com.consol.citrus.actions.ExecuteSQLQueryAction.Builder.query;
-import static com.consol.citrus.actions.ReceiveMessageAction.Builder.receive;
-import static com.consol.citrus.container.RepeatOnErrorUntilTrue.Builder.repeatOnError;
 import static com.consol.citrus.http.actions.HttpActionBuilder.http;
 
 /**
  * @author Christoph Deppisch
  */
 @ContextConfiguration(classes = EndpointConfig.class)
-public class DeleteFruitsIT extends JUnit4CitrusSpringSupport {
+public class UpdateNutritionIT extends JUnit4CitrusSpringSupport {
 
     @Autowired
     private HttpClient fruitStoreClient;
 
     @Autowired
-    private DataSource fruitsDataSource;
+    private HttpServer foodMarketService;
 
     @Autowired
-    private KafkaEndpoint fruitEvents;
+    private DataSource fruitsDataSource;
 
     @Test
     @CitrusTest
-    public void shouldDeleteFruits() {
-        Fruit fruit = TestHelper.createFruit("Watermelon",
-                new Category("melon"), new Nutrition(19, 5), Fruit.Status.PENDING, "juicy");
+    public void shouldUpdatePrice() {
+        Fruit fruit = TestHelper.createFruit("Mango",
+                new Category( "tropical"), new Nutrition(54, 11), Fruit.Status.PENDING, "summer");
 
+        given(createVariable("calories", "60"));
+        given(createVariable("sugar", "12"));
         given(applyBehavior(new AddFruitBehavior(fruit, fruitStoreClient)));
 
-        then(receive(fruitEvents)
-                .message()
-                .header(KafkaMessageHeaders.MESSAGE_KEY, "${id}")
-                .body("added::" + fruit.getId()));
-
-        then(repeatOnError()
-            .autoSleep(1000L)
-            .until((i, context) -> i > 5)
-            .actions(query(fruitsDataSource)
-                .statement("SELECT count(id) as found_records FROM fruit WHERE id=${id}")
-                .validate("found_records", "1")));
-
         when(http().client(fruitStoreClient)
-            .send()
-            .delete("/api/fruits/${id}")
-            .fork(true));
-
-        then(receive(fruitEvents)
+                .send()
+                .get("/api/fruits/nutrition/" + fruit.getId())
+                .fork(true)
                 .message()
-                .header(KafkaMessageHeaders.MESSAGE_KEY, "${id}")
-                .body("removed::" + fruit.getId()));
+                .contentType(MediaType.APPLICATION_JSON_VALUE));
+
+        then(http().server(foodMarketService)
+                .receive()
+                .get("/market/fruits/nutrition/" + fruit.getName().toLowerCase()));
+
+        then(http().server(foodMarketService)
+                .send()
+                .response(HttpStatus.OK)
+                .message()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body("{ \"calories\": ${calories}, \"sugar\": ${sugar} }"));
 
         then(http().client(fruitStoreClient)
                 .receive()
-                .response(HttpStatus.NO_CONTENT));
+                .response(HttpStatus.OK));
 
         then(query(fruitsDataSource)
-                .statement("SELECT count(id) as found_records FROM fruit WHERE id=${id}")
-                .validate("found_records", "0"));
+                .statement("SELECT calories, sugar FROM nutrition INNER JOIN fruit ON nutrition.id = fruit.nutrition_id WHERE fruit.id=${id}")
+                .validate("calories", "${calories}")
+                .validate("sugar", "${sugar}"));
     }
-
 }

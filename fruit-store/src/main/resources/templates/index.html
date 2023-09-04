@@ -22,14 +22,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link
         rel="stylesheet"
-        href="https://unpkg.com/@patternfly/patternfly/patternfly.css"
+        href="styles/patternfly.css"
         crossorigin="anonymous"
     >
     <title>Fruit Store - 1.0-SNAPSHOT</title>
 </head>
 <body>
 <div class="pf-c-page" id="fruit-store">
-    <a class="pf-c-skip-to-content pf-c-button pf-m-primary" href="#">Skip to content</a>
+    <a class="pf-c-skip-to-content pf-c-button pf-m-primary" href="#main-content-fruit-store">Skip to content</a>
     <header class="pf-c-page__header">
         <div class="pf-c-page__header-brand">
             <div class="pf-c-page__header-brand-toggle">
@@ -59,161 +59,249 @@
         </section>
         <section class="pf-c-page__main-section pf-m-no-padding pf-m-padding-on-xl">
             <div class="pf-c-card">
-                <form class="pf-c-inline-edit" id="new-fruit" action="/" method="post">
-                    <table class="pf-c-table pf-m-grid-xl" role="grid" aria-label="This is a table with checkboxes" id="page-layout-table-simple-table">
-                        <thead>
+                <table class="pf-c-table pf-m-grid-xl" role="grid" aria-label="This is a table with checkboxes" id="fruits">
+                    <thead>
+                    <tr role="row">
+                        <th role="columnheader" scope="col">Id</th>
+                        <th role="columnheader" scope="col">Name</th>
+                        <th role="columnheader" scope="col">Category</th>
+                        <th role="columnheader" scope="col">Description</th>
+                        <th role="columnheader" scope="col">Tags</th>
+                        <th role="columnheader" scope="col">Price</th>
+                        <th role="columnheader" scope="col">Calories</th>
+                        <th role="columnheader" scope="col">Sugar</th>
+                        <th role="columnheader" scope="col">Status</th>
+                        <td role="cell"></td>
+                    </tr>
+                    </thead>
+                    <tbody role="rowgroup">
+                    {#for fruit in fruits}
                         <tr role="row">
-                            <th role="columnheader" scope="col">Id</th>
-                            <th role="columnheader" scope="col">Name</th>
-                            <th role="columnheader" scope="col">Category</th>
-                            <th role="columnheader" scope="col">Description</th>
-                            <th role="columnheader" scope="col">Tags</th>
-                            <th role="columnheader" scope="col">Price</th>
-                            <th role="columnheader" scope="col">Status</th>
-                            <td role="cell"></td>
-                        </tr>
-                        </thead>
-                        <tbody role="rowgroup">
-                        {#for fruit in fruits}
-                        <tr class="pf-m-inline-editable" role="row">
-                            <th role="columnheader" data-label="Id">
-                                <div>
-                                    <div id="page-layout-table-simple-table-node1">#{fruit.id}</div>
-                                </div>
-                            </th>
-                            <td role="cell" data-label="Name">
-                                <span>{fruit.name}</span>
-                            </td>
-                            <td role="cell" data-label="Category">
-                                <span>{fruit.category.name}</span>
-                            </td>
-                            <td role="cell" data-label="Description">
-                                {#if fruit.description}
+                        <th role="columnheader" data-label="Id">
+                            <span>#{fruit.id}</span>
+                        </th>
+                        <td role="cell" data-label="Name">
+                            <span>{fruit.name}</span>
+                        </td>
+                        <td role="cell" data-label="Category">
+                            <span>{fruit.category.name}</span>
+                        </td>
+                        <td role="cell" data-label="Description">
+                            {#if fruit.description}
                                 <span>{fruit.description}</span>
-                                {#else}
+                            {#else}
                                 <span>No description</span>
-                                {/if}
-                            </td>
-                            <td role="cell" data-label="Tags">
-                                {#if fruit.tags}
+                            {/if}
+                        </td>
+                        <td role="cell" data-label="Tags">
+                            {#if fruit.tags}
                                 {#for tag in fruit.tags}
-                                <span>[{tag}]</span>
+                                    <span>[{tag}]</span>
                                 {/for}
-                                {#else}
+                            {#else}
                                 <span>[]</span>
-                                {/if}
-                            </td>
-                            <td role="cell" data-label="Price">
-                                {#if fruit.price}
+                            {/if}
+                        </td>
+                        <td role="cell" data-label="Price">
+                            {#if fruit.price}
                                 <span>{fruit.price}</span>
-                                {#else}
+                            {#else}
                                 <span>0.00</span>
-                                {/if}
-                            </td>
-                            <td role="cell" data-label="Status">
-                                <span>{fruit.status}</span>
-                            </td>
-                            <td class="pf-c-table__inline-edit-action" role="cell" data-label="Action">
-                                <div class="pf-c-inline-edit__group pf-m-action-group pf-m-icon-group">
-                                    <div class="pf-c-inline-edit__action pf-m-valid">
-                                        <button id="view" class="pf-c-button pf-m-plain" type="button" aria-label="View fruit">
-                                            <i class="fas fa-search" aria-hidden="true"></i>
-                                        </button>
-                                    </div>
-                                    <div class="pf-c-inline-edit__action">
-                                        <button id="delete" class="pf-c-button pf-m-plain" type="button" aria-label="Delete fruit">
-                                            <i class="fas fa-times" aria-hidden="true"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </td>
+                            {/if}
+                        </td>
+                        <td role="cell" data-label="Calories">
+                            {#if fruit.nutrition}
+                                <span>{fruit.nutrition.calories}</span>
+                            {#else}
+                                <span>0</span>
+                            {/if}
+                        </td>
+                        <td role="cell" data-label="Sugar">
+                            {#if fruit.nutrition}
+                                <span>{fruit.nutrition.sugar}</span>
+                            {#else}
+                                <span>0</span>
+                            {/if}
+                        </td>
+                        <td role="cell" data-label="Status">
+                        <span>{fruit.status}</span>
+                        </td>
+                        <td role="cell" data-label="Action">
+                            <a href="#">View</a>
+                        </td>
                         </tr>
-                        {/for}
-                        <tr>
-                            <td colspan="8"></td>
-                        </tr>
-                        <tr class="pf-m-inline-editable" role="row">
-                            <td role="cell" data-label="Id">
-                                <strong>New fruit:</strong>
-                            </td>
-                            <td role="cell" data-label="Name">
-                                <div class="pf-c-inline-edit__value">Name</div>
-                                <div class="pf-c-inline-edit__input">
-                                    <input class="pf-c-form-control" type="text" value="" id="name" name="name" aria-label="Name" />
-                                </div>
-                            </td>
-                            <td role="cell" data-label="Category">
-                                <div class="pf-c-inline-edit__value">Category</div>
-                                <div class="pf-c-inline-edit__input">
-                                    <select class="pf-c-form-control" id="category" name="category" aria-label="Category">
-                                        <option selected value="">Please choose</option>
-                                        {#for category in categories}
-                                        <option value="{category.name}">{category.name}</option>
-                                        {/for}
-                                    </select>
-                                </div>
-                            </td>
-                            <td role="cell" data-label="Description">
-                                <div class="pf-c-inline-edit__value">Description</div>
-                                <div class="pf-c-inline-edit__input">
-                                    <input class="pf-c-form-control" type="text" value="" id="description" name="description" aria-label="Description" />
-                                </div>
-                            </td>
-                            <td role="cell" data-label="Tags">
-                                <div class="pf-c-inline-edit__value">Tags</div>
-                                <div class="pf-c-inline-edit__input">
-                                    <input class="pf-c-form-control" type="text" value="" id="tags" name="tags" aria-label="Tags" />
-                                </div>
-                            </td>
-                            <td role="cell" data-label="Price">
-                                <div class="pf-c-inline-edit__value">Price</div>
-                                <div class="pf-c-inline-edit__input">
-                                    <input class="pf-c-form-control" type="text" value="0.00" id="price" name="price" aria-label="Price" />
-                                </div>
-                            </td>
-                            <td role="cell" data-label="Status">
-                                <div class="pf-c-inline-edit__value">Status</div>
-                                <div class="pf-c-inline-edit__input">
-                                    <select class="pf-c-form-control" id="status" name="status" aria-label="STATUS">
-                                        <option selected value="PENDING">PENDING</option>
-                                        <option value="AVAILABLE">AVAILABLE</option>
-                                        <option value="SOLD">SOLD</option>
-                                    </select>
-                                </div>
-                            </td>
-                            <td class="pf-c-table__inline-edit-action" role="cell" data-label="Action">
-                                <div class="pf-c-inline-edit__group pf-m-action-group pf-m-icon-group">
-                                    <div class="pf-c-inline-edit__action pf-m-valid">
-                                        <button id="save" class="pf-c-button pf-m-plain" type="button" aria-label="Save edits">
-                                            <i class="fas fa-check" aria-hidden="true"></i>
-                                        </button>
-                                    </div>
-                                    <div class="pf-c-inline-edit__action">
-                                        <button id="cancel" class="pf-c-button pf-m-plain" type="button" aria-label="Cancel edits">
-                                            <i class="fas fa-times" aria-hidden="true"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </form>
+                    {/for}
+                    </tbody>
+                </table>
             </div>
+        </section>
+        <section class="pf-c-page__main-section pf-m-no-padding pf-m-padding-on-xl">
+            <form class="pf-c-form" id="new-fruit" action="/" method="post" novalidate>
+                <div class="pf-l-grid pf-m-all-4-col-on-md pf-m-gutter">
+                    <div class="pf-c-form__group">
+                        <div class="pf-c-form__group-label"><label class="pf-c-form__label" for="name">
+                            <span class="pf-c-form__label-text">Name</span></label>
+                        </div>
+                        <div class="pf-c-form__group-control">
+                            <input
+                                    class="pf-c-form-control"
+                                    required
+                                    type="text"
+                                    id="name"
+                                    name="name"
+                            />
+                        </div>
+                    </div>
+                    <div class="pf-c-form__group">
+                        <div class="pf-c-form__group-label"><label class="pf-c-form__label" for="description">
+                            <span class="pf-c-form__label-text">Description</span></label>
+                        </div>
+                        <div class="pf-c-form__group-control">
+                            <input
+                                    class="pf-c-form-control"
+                                    required
+                                    type="text"
+                                    id="description"
+                                    name="description"
+                            />
+                        </div>
+                    </div>
+                    <div class="pf-c-form__group">
+                        <div class="pf-c-form__group-label"><label class="pf-c-form__label" for="tags">
+                            <span class="pf-c-form__label-text">Tags</span></label>
+                        </div>
+                        <div class="pf-c-form__group-control">
+                            <input
+                                    class="pf-c-form-control"
+                                    required
+                                    type="text"
+                                    id="tags"
+                                    name="tags"
+                            />
+                        </div>
+                    </div>
+                    <div class="pf-c-form__group">
+                        <div class="pf-c-form__group-label"><label class="pf-c-form__label" for="price">
+                            <span class="pf-c-form__label-text">Price</span></label>
+                        </div>
+                        <div class="pf-c-form__group-control">
+                            <input
+                                    class="pf-c-form-control"
+                                    required
+                                    type="text"
+                                    id="price"
+                                    value="0.00"
+                                    name="price"
+                            />
+                        </div>
+                    </div>
+                    <div class="pf-c-form__group">
+                        <div class="pf-c-form__group-label"><label class="pf-c-form__label" for="calories">
+                            <span class="pf-c-form__label-text">Calories</span></label>
+                        </div>
+                        <div class="pf-c-form__group-control">
+                            <input
+                                    class="pf-c-form-control"
+                                    required
+                                    type="text"
+                                    id="calories"
+                                    value="0"
+                                    name="calories"
+                            />
+                        </div>
+                    </div>
+                    <div class="pf-c-form__group">
+                        <div class="pf-c-form__group-label"><label class="pf-c-form__label" for="sugar">
+                            <span class="pf-c-form__label-text">Sugar</span></label>
+                        </div>
+                        <div class="pf-c-form__group-control">
+                            <input
+                                    class="pf-c-form-control"
+                                    required
+                                    type="text"
+                                    id="sugar"
+                                    value="0"
+                                    name="sugar"
+                            />
+                        </div>
+                    </div>
+                    <div class="pf-c-form__group">
+                        <div class="pf-c-form__group-label"><label class="pf-c-form__label" for="category">
+                            <span class="pf-c-form__label-text">Category</span></label>
+                        </div>
+                        <div class="pf-c-form__group-control">
+                            <select
+                                    class="pf-c-form-control"
+                                    id="category"
+                                    name="category"
+                            >
+                                <option value selected>Select one</option>
+                                {#for category in categories}
+                                    <option value="{category.name}">{category.name}</option>
+                                {/for}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="pf-c-form__group">
+                        <div class="pf-c-form__group-label"><label class="pf-c-form__label" for="status">
+                                <span class="pf-c-form__label-text">Status</span></label>
+                        </div>
+                        <div class="pf-c-form__group-control">
+                            <select
+                                    class="pf-c-form-control"
+                                    id="status"
+                                    name="status"
+                            >
+                                <option value selected>Select one</option>
+                                <option value="PENDING">PENDING</option>
+                                <option value="SOLD">SOLD</option>
+                                <option value="AVAILABLE">AVAILABLE</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="pf-c-form__group pf-m-action">
+                        <div class="pf-c-form__group-control">
+                            <div class="pf-c-form__actions">
+                                <button id="save" class="pf-c-button pf-m-primary" type="submit">Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
         </section>
     </main>
 </div>
 </body>
-<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="scripts/jquery-3.3.1.min.js"></script>
 <script>
-    $(document).ready(function() {
-        $("#save").click(function( event ) {
-            $("#new-fruit").submit();
-        });
+    const source = new EventSource("/fruits");
+    source.onmessage = function(event) {
+        var fruit = JSON.parse(event.data);
 
-        $("#cancel").click(function( event ) {
-            $("#new-fruit").trigger("reset");
-        });
-    });
+        console.log("Received Data:",fruit)
+
+        var tableRef = document
+            .getElementById("fruits")
+            .getElementsByTagName("tbody")[0];
+
+        // Insert a row in the table at the last row
+        var newRow = tableRef.insertRow();
+
+        newRow.insertCell(0).appendChild(document.createTextNode("#" + fruit.id));
+        newRow.insertCell(1).appendChild(document.createTextNode(fruit.name));
+        newRow.insertCell(2).appendChild(document.createTextNode(fruit.category.name));
+        newRow.insertCell(3).appendChild(document.createTextNode(fruit.description));
+
+        var tags = ""
+        for (const tag of fruit.tags) {
+            tags = tags + "[" + tag + "] "
+        }
+        newRow.insertCell(4).appendChild(document.createTextNode(tags));
+        newRow.insertCell(5).appendChild(document.createTextNode(fruit.price));
+        newRow.insertCell(6).appendChild(document.createTextNode(fruit.nutrition.calories));
+        newRow.insertCell(7).appendChild(document.createTextNode(fruit.nutrition.sugar));
+        newRow.insertCell(8).appendChild(document.createTextNode(fruit.status));
+        $(newRow.insertCell(9)).html("<a href=\"#\">View</a>");
+    };
 </script>
 </html>

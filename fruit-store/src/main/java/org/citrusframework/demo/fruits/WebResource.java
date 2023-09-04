@@ -17,6 +17,10 @@
 
 package org.citrusframework.demo.fruits;
 
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -25,32 +29,48 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.stream.Collectors;
 
 import io.quarkus.qute.Template;
 import io.quarkus.qute.TemplateInstance;
 import org.citrusframework.demo.fruits.model.Category;
 import org.citrusframework.demo.fruits.model.Fruit;
+import org.citrusframework.demo.fruits.model.Nutrition;
+import org.eclipse.microprofile.reactive.messaging.Channel;
+import org.eclipse.microprofile.reactive.messaging.Emitter;
+import org.jboss.logging.Logger;
+import org.reactivestreams.Publisher;
 
-/**
- * @author Christoph Deppisch
- */
 @Path("/")
-@Produces(MediaType.TEXT_HTML)
 public class WebResource {
 
     @Inject
     Template index;
 
     @Inject
+    @Channel("fruit-events")
+    Emitter<Fruit> fruitEventsEmitter;
+
+    @Inject
+    @Channel("fruit-events-stream")
+    Publisher<String> fruitEvents;
+
+    @Inject
     FruitStore store;
 
     @GET
+    @Produces(MediaType.TEXT_HTML)
     public TemplateInstance index() {
-        return index.data("fruits", store.findAll())
+        List<Fruit> fruits = store.findAll();
+        Logger.getLogger("FRUITS").info(fruits);
+        return index.data("fruits", fruits)
                     .data("categories", store.getCategories());
+    }
+
+    @GET
+    @Path("/fruits")
+    @Produces(MediaType.SERVER_SENT_EVENTS)
+    public Publisher<String> fruitProcessor() {
+        return fruitEvents;
     }
 
     @POST
@@ -62,6 +82,16 @@ public class WebResource {
             fruit.setCategory(new Category(form.getFirst("category")));
         }
 
+        if (form.getFirst("sugar") != null && !form.getFirst("sugar").isEmpty()) {
+            Nutrition nutrition = new Nutrition();
+            nutrition.setSugar(Integer.parseInt(form.getFirst("sugar")));
+            if (form.getFirst("calories") != null && !form.getFirst("calories").isEmpty()) {
+                nutrition.setCalories(Integer.parseInt(form.getFirst("calories")));
+            }
+
+            fruit.setNutrition(nutrition);
+        }
+
         fruit.setPrice(new BigDecimal(form.getFirst("price")));
         fruit.setStatus(Fruit.Status.valueOf(form.getFirst("status")));
         fruit.setTags(Arrays.stream(form.getFirst("tags").split(","))
@@ -69,6 +99,10 @@ public class WebResource {
                 .collect(Collectors.toList()));
 
         store.add(fruit);
+
+        if (fruitEventsEmitter.hasRequests()) {
+            fruitEventsEmitter.send(fruit);
+        }
         return index();
     }
 }

@@ -38,7 +38,7 @@
       <exclusions>
         <exclusion>
           <groupId>org.jboss.slf4j</groupId>
-          <artifactId>slf4j-jboss-logging</artifactId>
+          <artifactId>slf4j-jboss-logmanager</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -72,6 +72,11 @@
     <dependency>
       <groupId>com.consol.citrus</groupId>
       <artifactId>citrus-junit</artifactId>
+      <version>${citrus.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.consol.citrus</groupId>
+      <artifactId>citrus-sql</artifactId>
       <version>${citrus.version}</version>
     </dependency>
     <dependency>

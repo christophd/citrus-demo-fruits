@@ -19,12 +19,13 @@ package org.citrusframework.demo;
 
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.http.client.HttpClient;
-import com.consol.citrus.junit.JUnit4CitrusSupport;
+import com.consol.citrus.junit.spring.JUnit4CitrusSpringSupport;
 import com.consol.citrus.message.builder.ObjectMappingPayloadBuilder;
 import org.citrusframework.demo.behavior.AddFruitBehavior;
 import org.citrusframework.demo.config.EndpointConfig;
 import org.citrusframework.demo.fruits.model.Category;
 import org.citrusframework.demo.fruits.model.Fruit;
+import org.citrusframework.demo.fruits.model.Nutrition;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -38,7 +39,7 @@ import static com.consol.citrus.http.actions.HttpActionBuilder.http;
  * @author Christoph Deppisch
  */
 @ContextConfiguration(classes = EndpointConfig.class)
-public class AddFruitsIT extends JUnit4CitrusSupport {
+public class AddFruitsIT extends JUnit4CitrusSpringSupport {
 
     @Autowired
     private HttpClient fruitStoreClient;
@@ -48,14 +49,19 @@ public class AddFruitsIT extends JUnit4CitrusSupport {
     public void shouldAddFruits() {
         when(http().client(fruitStoreClient)
                 .send()
-                .post("/fruits")
+                .post("/api/fruits")
+                .message()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .payload("{" +
+                .body("{" +
                     "\"name\": \"Banana\"," +
                     "\"description\": \"citrus:randomString(10)\"," +
                     "\"category\": {" +
                         "\"id\": 2," +
                         "\"name\": \"tropical\"" +
+                    "}," +
+                    "\"nutrition\":{\n" +
+                        "\"calories\": 97,\n" +
+                        "\"sugar\": 14\n" +
                     "}," +
                     "\"status\": \"PENDING\"," +
                     "\"tags\": [\"sweet\"]" +
@@ -71,9 +77,10 @@ public class AddFruitsIT extends JUnit4CitrusSupport {
     public void shouldAddFruitsFromResource() {
         when(http().client(fruitStoreClient)
                 .send()
-                .post("/fruits")
+                .post("/api/fruits")
+                .message()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .payload(new ClassPathResource("data/fruit.json")));
+                .body(new ClassPathResource("data/fruit.json")));
 
         then(http().client(fruitStoreClient)
                 .receive()
@@ -84,13 +91,14 @@ public class AddFruitsIT extends JUnit4CitrusSupport {
     @CitrusTest
     public void shouldAddFruitsFromModel() {
         Fruit fruit = TestHelper.createFruit("Blueberry",
-                new Category("berry"), Fruit.Status.PENDING, "smoothie");
+                new Category("berry"), new Nutrition(34, 8), Fruit.Status.PENDING, "smoothie");
 
         when(http().client(fruitStoreClient)
                 .send()
-                .post("/fruits")
+                .post("/api/fruits")
+                .message()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .payload(new ObjectMappingPayloadBuilder(fruit)));
+                .body(new ObjectMappingPayloadBuilder(fruit)));
 
         then(http().client(fruitStoreClient)
                 .receive()
@@ -101,7 +109,7 @@ public class AddFruitsIT extends JUnit4CitrusSupport {
     @CitrusTest
     public void shouldAddFruitsFromBehavior() {
         Fruit fruit = TestHelper.createFruit("Raspberry",
-                new Category("berry"), Fruit.Status.PENDING, "smoothie");
+                new Category("berry"), new Nutrition(42, 9), Fruit.Status.PENDING, "smoothie");
 
         given(applyBehavior(new AddFruitBehavior(fruit, fruitStoreClient)));
     }

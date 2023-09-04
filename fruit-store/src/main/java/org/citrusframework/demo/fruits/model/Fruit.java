@@ -17,6 +17,9 @@
 
 package org.citrusframework.demo.fruits.model;
 
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
 import javax.persistence.AttributeConverter;
 import javax.persistence.CascadeType;
 import javax.persistence.Convert;
@@ -28,9 +31,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.SequenceGenerator;
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * @author Christoph Deppisch
@@ -50,7 +50,8 @@ public class Fruit {
     private Category category;
     private List<String> tags;
     private Status status = Status.PENDING;
-    private BigDecimal price;
+    private Nutrition nutrition;
+    private BigDecimal price = new BigDecimal("0.1");
 
     public Fruit() {
     }
@@ -115,6 +116,15 @@ public class Fruit {
 
     public void setCategory(Category category) {
         this.category = category;
+    }
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    public Nutrition getNutrition() {
+        return nutrition;
+    }
+
+    public void setNutrition(Nutrition nutrition) {
+        this.nutrition = nutrition;
     }
 
     @Convert(converter = StringListConverter.class)

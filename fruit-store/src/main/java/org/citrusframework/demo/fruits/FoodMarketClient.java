@@ -15,33 +15,31 @@
  * limitations under the License.
  */
 
-package org.citrusframework.demo;
+package org.citrusframework.demo.fruits;
 
-import java.math.BigDecimal;
-import java.util.Arrays;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 
-import org.citrusframework.demo.fruits.model.Category;
-import org.citrusframework.demo.fruits.model.Fruit;
 import org.citrusframework.demo.fruits.model.Nutrition;
+import org.citrusframework.demo.fruits.model.Price;
+import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
 /**
  * @author Christoph Deppisch
  */
-public class TestHelper {
+@Path("/market/fruits")
+@RegisterRestClient(configKey="food-market-client")
+public interface FoodMarketClient {
 
-    private TestHelper() {
-        // prevent instantiation of utility class.
-    }
+    @GET
+    @Path("/price/{name}")
+    @Produces("application/json")
+    Price getPrice(@PathParam("name") String name);
 
-    public static Fruit createFruit(String name, Category category, Nutrition nutrition,
-                                    Fruit.Status status, String... tags) {
-        Fruit fruit = new Fruit();
-        fruit.setName(name);
-        fruit.setCategory(category);
-        fruit.setNutrition(nutrition);
-        fruit.setStatus(status);
-        fruit.setPrice(BigDecimal.valueOf(0.00D));
-        fruit.setTags(Arrays.asList(tags));
-        return fruit;
-    }
+    @GET
+    @Path("/nutrition/{name}")
+    @Produces("application/json")
+    Nutrition getNutrition(@PathParam("name") String name);
 }

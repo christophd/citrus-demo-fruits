@@ -5,6 +5,10 @@
     "id": 2,
     "name": "tropical"
   },
+  "nutrition":{
+    "calories": 97,
+    "sugar": 14
+  },
   "status": "PENDING",
   "tags": ["sweet", "cocktail"]
 }

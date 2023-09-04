@@ -28,8 +28,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
+import static com.consol.citrus.dsl.JsonPathSupport.jsonPath;
 import static com.consol.citrus.http.actions.HttpActionBuilder.http;
-import static com.consol.citrus.validation.json.JsonPathVariableExtractor.Builder.jsonPathExtractor;
 
 /**
  * @author Christoph Deppisch
@@ -50,15 +50,17 @@ public class AddFruitBehavior implements TestBehavior {
     public void apply(TestActionRunner runner) {
         runner.run(http().client(client)
                 .send()
-                .post("/fruits")
+                .post("/api/fruits")
+                .message()
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .payload(new ObjectMappingPayloadBuilder(fruit)));
+                .body(new ObjectMappingPayloadBuilder(fruit)));
 
         runner.run(http().client(client)
                 .receive()
                 .response(HttpStatus.CREATED)
-                .process(jsonPathExtractor()
-                        .expression("$.id", idVariable)));
+                .message()
+                .extract(jsonPath()
+                            .expression("$.id", idVariable)));
 
         runner.run(new AbstractTestAction() {
             @Override
