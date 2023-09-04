@@ -18,10 +18,7 @@
 package org.citrusframework.demo.config;
 
 import org.citrusframework.container.AfterSuite;
-import org.citrusframework.container.AfterTest;
 import org.citrusframework.container.SequenceAfterSuite;
-import org.citrusframework.container.SequenceAfterTest;
-import org.citrusframework.context.TestContext;
 import org.citrusframework.selenium.endpoint.SeleniumBrowser;
 import org.citrusframework.selenium.endpoint.SeleniumBrowserBuilder;
 import org.openqa.selenium.remote.Browser;
@@ -29,7 +26,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 
-import static org.citrusframework.actions.SleepAction.Builder.sleep;
 import static org.citrusframework.selenium.actions.SeleniumActionBuilder.selenium;
 
 /**
@@ -48,26 +44,10 @@ public class SeleniumConfig {
     @Bean
     @DependsOn("browser")
     public AfterSuite afterSuite(SeleniumBrowser browser) {
-        return new SequenceAfterSuite() {
-            @Override
-            public void doExecute(TestContext context) {
-                selenium().browser(browser)
-                        .stop()
-                        .build()
-                        .execute(context);
-            }
-        };
-    }
-
-    @Bean
-    public AfterTest afterTest() {
-        return new SequenceAfterTest() {
-            @Override
-            public void doExecute(TestContext context) {
-                sleep().milliseconds(500L)
-                        .build()
-                        .execute(context);
-            }
-        };
+        return new SequenceAfterSuite.Builder().actions(
+                selenium()
+                    .browser(browser)
+                    .stop())
+            .build();
     }
 }

@@ -64,6 +64,8 @@ public class FruitsPage implements WebPage, PageValidator<FruitsPage> {
 
     private final Fruit fruit;
 
+    private static final boolean DELAY_ENABLED = false;
+
     public FruitsPage(Fruit fruit) {
         this.fruit = fruit;
     }
@@ -72,31 +74,57 @@ public class FruitsPage implements WebPage, PageValidator<FruitsPage> {
      * Adds fruit via HTML form submit on the page.
      */
     public void addFruit() {
+        delay(2000L);
+
         name.sendKeys(fruit.getName());
+        delay();
+
         description.sendKeys(fruit.getDescription());
 
         new Select(category).selectByValue(fruit.getCategory().getName());
+
+        delay();
 
         price.clear();
         price.sendKeys(fruit.getPrice().toPlainString());
         tags.sendKeys(String.join(",", fruit.getTags()));
 
+        delay();
         new Select(status).selectByValue(fruit.getStatus().name());
 
         if (fruit.getNutrition() != null) {
             calories.clear();
             calories.sendKeys(fruit.getNutrition().getCalories().toString());
 
+            delay();
+
             sugar.clear();
             sugar.sendKeys(fruit.getNutrition().getSugar().toString());
         }
 
+        delay();
         saveButton.click();
+
+        delay(5000L);
     }
 
     @Override
     public void validate(FruitsPage webPage, SeleniumBrowser browser, TestContext context) {
         Assertions.assertEquals("Fruit Store Demo", heading.getText());
         Assertions.assertTrue(saveButton.isEnabled());
+    }
+
+    private static void delay() {
+        delay(500L);
+    }
+
+    private static void delay(Long milliseconds) {
+        if (DELAY_ENABLED) {
+            try {
+                Thread.sleep(milliseconds);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 }
