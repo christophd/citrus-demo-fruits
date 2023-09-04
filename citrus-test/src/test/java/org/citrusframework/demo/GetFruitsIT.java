@@ -70,23 +70,25 @@ public class GetFruitsIT {
                 .receive()
                 .response(HttpStatus.OK)
                 .message()
-                .body("{" +
-                    "\"id\": ${id}," +
-                    "\"name\": \"Pineapple\"," +
-                    "\"description\": \"@ignore@\"," +
-                    "\"category\": {" +
-                        "\"id\": 2," +
-                        "\"name\":\"tropical\"" +
-                    "}," +
-                    "\"nutrition\": {" +
-                        "\"id\": 2," +
-                        "\"calories\": 97," +
-                        "\"sugar\": 14" +
-                    "}," +
-                    "\"status\": \"PENDING\"," +
-                    "\"price\": \"@greaterThan(0.00)@\"," +
-                    "\"tags\": [\"cocktail\"]" +
-                "}"));
+                .body("""
+                    {
+                        "id": ${id},
+                        "name": "Pineapple",
+                        "description": "@ignore@",
+                        "category": {
+                            "id": 2,
+                            "name":"tropical"
+                        },
+                        "nutrition": {
+                            "id": 2,
+                            "calories": 97,
+                            "sugar": 14
+                        },
+                        "status": "PENDING",
+                        "price": "@greaterThan(0.00)@",
+                        "tags": ["cocktail"]
+                    }
+                """));
     }
 
     @Test

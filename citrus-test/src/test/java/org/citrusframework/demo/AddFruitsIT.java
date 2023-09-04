@@ -57,20 +57,22 @@ public class AddFruitsIT {
                 .post("/api/fruits")
                 .message()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body("{" +
-                    "\"name\": \"Banana\"," +
-                    "\"description\": \"citrus:randomString(10)\"," +
-                    "\"category\": {" +
-                        "\"id\": 2," +
-                        "\"name\": \"tropical\"" +
-                    "}," +
-                    "\"nutrition\":{\n" +
-                        "\"calories\": 97,\n" +
-                        "\"sugar\": 14\n" +
-                    "}," +
-                    "\"status\": \"PENDING\"," +
-                    "\"tags\": [\"sweet\"]" +
-                "}"));
+                .body("""
+                    {
+                        "name": "Banana",
+                        "description": "citrus:randomString(10)",
+                        "category": {
+                            "id": 2,
+                            "name": "tropical"
+                        },
+                        "nutrition": {
+                            "calories": 97,
+                            "sugar": 14
+                        },
+                        "status": "PENDING",
+                        "tags": ["sweet"]
+                    }
+                """));
 
         $.then(http().client(fruitStoreClient)
                 .receive()
