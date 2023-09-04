@@ -321,6 +321,11 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ParameterDeclaration'
+        fragmentIds:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
         fragment:
           type: boolean
     TemplateInstance:
@@ -347,3 +352,8 @@ components:
           type: string
         charset:
           $ref: '#/components/schemas/Charset'
+  securitySchemes:
+    SecurityScheme:
+      type: http
+      description: Authentication
+      scheme: basic

@@ -20,17 +20,18 @@ package org.citrusframework.demo.fruits.model;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
-import javax.persistence.AttributeConverter;
-import javax.persistence.CascadeType;
-import javax.persistence.Convert;
-import javax.persistence.Converter;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.SequenceGenerator;
+
+import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Converter;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.NamedQueries;
+import jakarta.persistence.NamedQuery;
+import jakarta.persistence.SequenceGenerator;
 
 /**
  * @author Christoph Deppisch

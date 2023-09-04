@@ -17,19 +17,19 @@
 
 package org.citrusframework.demo.behavior;
 
-import com.consol.citrus.TestActionRunner;
-import com.consol.citrus.TestBehavior;
-import com.consol.citrus.actions.AbstractTestAction;
-import com.consol.citrus.context.TestContext;
-import com.consol.citrus.http.client.HttpClient;
-import com.consol.citrus.message.builder.ObjectMappingPayloadBuilder;
+import org.citrusframework.TestActionRunner;
+import org.citrusframework.TestBehavior;
+import org.citrusframework.actions.AbstractTestAction;
+import org.citrusframework.context.TestContext;
 import org.citrusframework.demo.fruits.model.Fruit;
+import org.citrusframework.http.client.HttpClient;
+import org.citrusframework.message.builder.ObjectMappingPayloadBuilder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-import static com.consol.citrus.dsl.JsonPathSupport.jsonPath;
-import static com.consol.citrus.http.actions.HttpActionBuilder.http;
+import static org.citrusframework.dsl.JsonPathSupport.jsonPath;
+import static org.citrusframework.http.actions.HttpActionBuilder.http;
 
 /**
  * @author Christoph Deppisch

@@ -20,12 +20,12 @@ package org.citrusframework.demo;
 import java.math.BigDecimal;
 import java.util.Map;
 
-import com.consol.citrus.annotations.CitrusTest;
-import com.consol.citrus.context.TestContext;
-import com.consol.citrus.http.client.HttpClient;
-import com.consol.citrus.junit.spring.JUnit4CitrusSpringSupport;
-import com.consol.citrus.message.builder.ObjectMappingPayloadBuilder;
-import com.consol.citrus.validation.json.JsonMappingValidationProcessor;
+import org.citrusframework.annotations.CitrusTest;
+import org.citrusframework.context.TestContext;
+import org.citrusframework.http.client.HttpClient;
+import org.citrusframework.junit.spring.JUnit4CitrusSpringSupport;
+import org.citrusframework.message.builder.ObjectMappingPayloadBuilder;
+import org.citrusframework.validation.json.JsonMappingValidationProcessor;
 import org.citrusframework.demo.config.EndpointConfig;
 import org.citrusframework.demo.fruits.model.Category;
 import org.citrusframework.demo.fruits.model.Fruit;
@@ -38,9 +38,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 
-import static com.consol.citrus.actions.CreateVariablesAction.Builder.createVariable;
-import static com.consol.citrus.http.actions.HttpActionBuilder.http;
-import static com.consol.citrus.validation.json.JsonPathMessageValidationContext.Builder.jsonPath;
+import static org.citrusframework.actions.CreateVariablesAction.Builder.createVariable;
+import static org.citrusframework.http.actions.HttpActionBuilder.http;
+import static org.citrusframework.validation.json.JsonPathMessageValidationContext.Builder.jsonPath;
 
 /**
  * @author Christoph Deppisch
@@ -144,7 +144,7 @@ public class GetFruitsIT extends JUnit4CitrusSpringSupport {
                         .expression("$.id", "${id}")
                         .expression("$.name", "Pineapple")
                         .expression("$.category.name", "tropical")
-                        .expression("$.status", Fruit.Status.PENDING)
+                        .expression("$.status", Fruit.Status.PENDING.name())
                         .expression("$.tags.size()", 1L)
                         .expression("$.price", BigDecimal.valueOf(1.99D))));
     }

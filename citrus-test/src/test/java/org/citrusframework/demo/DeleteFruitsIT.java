@@ -19,11 +19,11 @@ package org.citrusframework.demo;
 
 import javax.sql.DataSource;
 
-import com.consol.citrus.annotations.CitrusTest;
-import com.consol.citrus.http.client.HttpClient;
-import com.consol.citrus.junit.spring.JUnit4CitrusSpringSupport;
-import com.consol.citrus.kafka.endpoint.KafkaEndpoint;
-import com.consol.citrus.kafka.message.KafkaMessageHeaders;
+import org.citrusframework.annotations.CitrusTest;
+import org.citrusframework.http.client.HttpClient;
+import org.citrusframework.junit.spring.JUnit4CitrusSpringSupport;
+import org.citrusframework.kafka.endpoint.KafkaEndpoint;
+import org.citrusframework.kafka.message.KafkaMessageHeaders;
 import org.citrusframework.demo.behavior.AddFruitBehavior;
 import org.citrusframework.demo.config.EndpointConfig;
 import org.citrusframework.demo.fruits.model.Category;
@@ -34,10 +34,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 
-import static com.consol.citrus.actions.ExecuteSQLQueryAction.Builder.query;
-import static com.consol.citrus.actions.ReceiveMessageAction.Builder.receive;
-import static com.consol.citrus.container.RepeatOnErrorUntilTrue.Builder.repeatOnError;
-import static com.consol.citrus.http.actions.HttpActionBuilder.http;
+import static org.citrusframework.actions.ExecuteSQLQueryAction.Builder.query;
+import static org.citrusframework.actions.ReceiveMessageAction.Builder.receive;
+import static org.citrusframework.container.RepeatOnErrorUntilTrue.Builder.repeatOnError;
+import static org.citrusframework.http.actions.HttpActionBuilder.http;
 
 /**
  * @author Christoph Deppisch

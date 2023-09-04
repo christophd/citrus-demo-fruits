@@ -19,10 +19,10 @@ package org.citrusframework.demo;
 
 import java.math.BigDecimal;
 
-import com.consol.citrus.annotations.CitrusTest;
-import com.consol.citrus.http.client.HttpClient;
-import com.consol.citrus.junit.spring.JUnit4CitrusSpringSupport;
-import com.consol.citrus.selenium.endpoint.SeleniumBrowser;
+import org.citrusframework.annotations.CitrusTest;
+import org.citrusframework.http.client.HttpClient;
+import org.citrusframework.junit.spring.JUnit4CitrusSpringSupport;
+import org.citrusframework.selenium.endpoint.SeleniumBrowser;
 import org.citrusframework.demo.config.EndpointConfig;
 import org.citrusframework.demo.fruits.model.Category;
 import org.citrusframework.demo.fruits.model.Fruit;
@@ -32,7 +32,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
-import static com.consol.citrus.selenium.actions.SeleniumActionBuilder.selenium;
+import static org.citrusframework.selenium.actions.SeleniumActionBuilder.selenium;
 
 /**
  * @author Christoph Deppisch

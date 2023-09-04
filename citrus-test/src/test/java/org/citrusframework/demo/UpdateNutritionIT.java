@@ -19,10 +19,10 @@ package org.citrusframework.demo;
 
 import javax.sql.DataSource;
 
-import com.consol.citrus.annotations.CitrusTest;
-import com.consol.citrus.http.client.HttpClient;
-import com.consol.citrus.http.server.HttpServer;
-import com.consol.citrus.junit.spring.JUnit4CitrusSpringSupport;
+import org.citrusframework.annotations.CitrusTest;
+import org.citrusframework.http.client.HttpClient;
+import org.citrusframework.http.server.HttpServer;
+import org.citrusframework.junit.spring.JUnit4CitrusSpringSupport;
 import org.citrusframework.demo.behavior.AddFruitBehavior;
 import org.citrusframework.demo.config.EndpointConfig;
 import org.citrusframework.demo.fruits.model.Category;
@@ -34,9 +34,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 
-import static com.consol.citrus.actions.CreateVariablesAction.Builder.createVariable;
-import static com.consol.citrus.actions.ExecuteSQLQueryAction.Builder.query;
-import static com.consol.citrus.http.actions.HttpActionBuilder.http;
+import static org.citrusframework.actions.CreateVariablesAction.Builder.createVariable;
+import static org.citrusframework.actions.ExecuteSQLQueryAction.Builder.query;
+import static org.citrusframework.http.actions.HttpActionBuilder.http;
 
 /**
  * @author Christoph Deppisch

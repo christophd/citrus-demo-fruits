@@ -27,15 +27,16 @@
   <description>Quarkus Fruit-Store application tested with Citrus</description>
 
   <properties>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
+    <java.version>17</java.version>
+    <maven.compiler.source>${java.version}</maven.compiler.source>
+    <maven.compiler.target>${java.version}</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <quarkus.version>2.16.2.Final</quarkus.version>
-    <apache.kafka.version>3.3.2</apache.kafka.version>
+    <quarkus.version>3.3.1</quarkus.version>
+    <apache.kafka.version>3.5.1</apache.kafka.version>
 
-    <citrus.version>3.4.0</citrus.version>
-    <slf4j.version>1.7.36</slf4j.version>
-    <log4j2.version>2.19.0</log4j2.version>
+    <citrus.version>4.0.0-M2</citrus.version>
+    <slf4j.version>2.0.7</slf4j.version>
+    <log4j2.version>2.20.0</log4j2.version>
   </properties>
 
   <modules>
@@ -47,7 +48,7 @@
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.1</version>
+        <version>3.11.0</version>
         <configuration>
           <encoding>${project.build.sourceEncoding}</encoding>
           <source>${maven.compiler.source}</source>

@@ -17,17 +17,17 @@
 
 package org.citrusframework.demo.config;
 
-import com.consol.citrus.container.BeforeTest;
-import com.consol.citrus.container.SequenceBeforeTest;
-import com.consol.citrus.context.TestContext;
-import com.consol.citrus.http.client.HttpClient;
-import com.consol.citrus.http.client.HttpClientBuilder;
-import com.consol.citrus.http.server.HttpServer;
-import com.consol.citrus.http.server.HttpServerBuilder;
-import com.consol.citrus.kafka.embedded.EmbeddedKafkaServer;
-import com.consol.citrus.kafka.embedded.EmbeddedKafkaServerBuilder;
-import com.consol.citrus.kafka.endpoint.KafkaEndpoint;
-import com.consol.citrus.kafka.endpoint.KafkaEndpointBuilder;
+import org.citrusframework.container.BeforeTest;
+import org.citrusframework.container.SequenceBeforeTest;
+import org.citrusframework.context.TestContext;
+import org.citrusframework.http.client.HttpClient;
+import org.citrusframework.http.client.HttpClientBuilder;
+import org.citrusframework.http.server.HttpServer;
+import org.citrusframework.http.server.HttpServerBuilder;
+import org.citrusframework.kafka.embedded.EmbeddedKafkaServer;
+import org.citrusframework.kafka.embedded.EmbeddedKafkaServerBuilder;
+import org.citrusframework.kafka.endpoint.KafkaEndpoint;
+import org.citrusframework.kafka.endpoint.KafkaEndpointBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.context.annotation.Bean;
@@ -35,7 +35,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Import;
 
-import static com.consol.citrus.actions.PurgeEndpointAction.Builder.purgeEndpoints;
+import static org.citrusframework.actions.PurgeEndpointAction.Builder.purgeEndpoints;
 
 @Configuration
 @Import(SeleniumConfig.class)

@@ -17,20 +17,20 @@
 
 package org.citrusframework.demo.config;
 
-import com.consol.citrus.container.AfterSuite;
-import com.consol.citrus.container.AfterTest;
-import com.consol.citrus.container.SequenceAfterSuite;
-import com.consol.citrus.container.SequenceAfterTest;
-import com.consol.citrus.context.TestContext;
-import com.consol.citrus.selenium.endpoint.SeleniumBrowser;
-import com.consol.citrus.selenium.endpoint.SeleniumBrowserBuilder;
+import org.citrusframework.container.AfterSuite;
+import org.citrusframework.container.AfterTest;
+import org.citrusframework.container.SequenceAfterSuite;
+import org.citrusframework.container.SequenceAfterTest;
+import org.citrusframework.context.TestContext;
+import org.citrusframework.selenium.endpoint.SeleniumBrowser;
+import org.citrusframework.selenium.endpoint.SeleniumBrowserBuilder;
 import org.openqa.selenium.remote.Browser;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 
-import static com.consol.citrus.actions.SleepAction.Builder.sleep;
-import static com.consol.citrus.selenium.actions.SeleniumActionBuilder.selenium;
+import static org.citrusframework.actions.SleepAction.Builder.sleep;
+import static org.citrusframework.selenium.actions.SeleniumActionBuilder.selenium;
 
 /**
  * @author Christoph Deppisch

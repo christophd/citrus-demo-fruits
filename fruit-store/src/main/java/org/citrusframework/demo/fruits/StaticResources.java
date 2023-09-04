@@ -17,11 +17,10 @@
 
 package org.citrusframework.demo.fruits;
 
-import javax.enterprise.event.Observes;
-
 import io.quarkus.runtime.StartupEvent;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.StaticHandler;
+import jakarta.enterprise.event.Observes;
 
 public class StaticResources {
 

@@ -464,6 +464,13 @@
               "$ref" : "#/components/schemas/ParameterDeclaration"
             }
           },
+          "fragmentIds" : {
+            "uniqueItems" : true,
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
           "fragment" : {
             "type" : "boolean"
           }
@@ -504,6 +511,13 @@
             "$ref" : "#/components/schemas/Charset"
           }
         }
+      }
+    },
+    "securitySchemes" : {
+      "SecurityScheme" : {
+        "type" : "http",
+        "description" : "Authentication",
+        "scheme" : "basic"
       }
     }
   }
