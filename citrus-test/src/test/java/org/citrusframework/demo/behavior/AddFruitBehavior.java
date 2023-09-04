@@ -19,8 +19,6 @@ package org.citrusframework.demo.behavior;
 
 import org.citrusframework.TestActionRunner;
 import org.citrusframework.TestBehavior;
-import org.citrusframework.actions.AbstractTestAction;
-import org.citrusframework.context.TestContext;
 import org.citrusframework.demo.fruits.model.Fruit;
 import org.citrusframework.http.client.HttpClient;
 import org.citrusframework.message.builder.ObjectMappingPayloadBuilder;
@@ -47,27 +45,22 @@ public class AddFruitBehavior implements TestBehavior {
     }
 
     @Override
-    public void apply(TestActionRunner runner) {
-        runner.run(http().client(client)
+    public void apply(TestActionRunner $) {
+        $.run(http().client(client)
                 .send()
                 .post("/api/fruits")
                 .message()
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .body(new ObjectMappingPayloadBuilder(fruit)));
 
-        runner.run(http().client(client)
+        $.run(http().client(client)
                 .receive()
                 .response(HttpStatus.CREATED)
                 .message()
                 .extract(jsonPath()
                             .expression("$.id", idVariable)));
 
-        runner.run(new AbstractTestAction() {
-            @Override
-            public void doExecute(TestContext context) {
-                fruit.setId(Long.parseLong(context.getVariable(idVariable)));
-            }
-        });
+        $.run(context -> fruit.setId(Long.parseLong(context.getVariable(idVariable))));
     }
 
     public AddFruitBehavior withIdVariable(String name) {
